@@ -1,0 +1,27 @@
+- name: Sudo update
+  command: "sudo apt-get install git -y"
+  args:
+    creates: /usr/bin/git
+- name: Prepare Phoronix folder
+  command: "mkdir {{ base_path }}/phoronix"
+  args:
+    creates: "{{ base_path }}/phoronix"
+- name: Download Phoronix
+  command: "git clone --depth=1 https://github.com/phoronix-test-suite/phoronix-test-suite.git \"{{ base_path }}/phoronix\""
+  args:
+    creates: "{{ base_path }}/phoronix/phoronix-test-suite"
+- name: Install PHP-CLI for phoronix
+  command: "sudo apt-get install php-cli -y"
+  args:
+    creates: "{{ base_path }}/php_is_installed"
+- name: Install php-xml for phoronix
+  command: "sudo apt-get install php-xml -y"
+  args:
+    creates: "{{ base_path }}/php_is_installed"
+- name: chmod phoronix
+  file:
+    path: "{{ phoronix_test_suite }}"
+    state: file
+    owner: root
+    group: root
+    mode: 0777

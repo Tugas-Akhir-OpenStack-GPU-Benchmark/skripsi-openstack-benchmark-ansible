@@ -1,0 +1,30 @@
+- name: Install dos2unix
+  become: true
+  command: "apt-get install dos2unix -y"
+  delegate_to: localhost
+  args:
+    creates: "temp/dos2unix_is_installed"
+- name: Mark dos2unix installed
+  become: true
+  command: "touch \"temp/dos2unix_is_installed\""
+  delegate_to: localhost
+  args:
+    creates: "temp/dos2unix_is_installed"
+- name: Mark PHP as installed
+  command: "touch \"{{ base_path }}/php_is_installed\""
+  args:
+    creates: "{{ base_path }}/php_is_installed"
+- name: convert prime-run to linux just in case
+  command: "dos2unix \"{{ local_prime_run }}\""
+  delegate_to: localhost
+- name: copy prime-run
+  copy:
+    src: "{{ local_prime_run }}"
+    dest: "{{ prime_run }}"
+- name: chmod prime-run
+  file:
+    path: "{{ prime_run }}"
+    state: file
+    owner: root
+    group: root
+    mode: 0777

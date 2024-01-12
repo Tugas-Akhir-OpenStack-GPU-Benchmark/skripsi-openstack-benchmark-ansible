@@ -1,0 +1,17 @@
+- name: run glmark2 benchmark
+  async: 10000
+  poll: 5
+  expect:
+    timeout: 670
+    command: "{{ prime_run }} {{ phoronix_test_suite }} benchmark glmark2 2>&1"
+    responses:
+      'Resolution:': 4  # 1280 x 960
+      'Would you like to save these test results': 'n'
+  register: glmark2_benchmark_result
+- set_fact:
+    cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+- name: write glmark2 benchmark stdout logs
+  delegate_to: localhost
+  copy:
+    content: "{{ cleaned_glmark2_benchmark_result }}"
+    dest: temp/glmark2_benchmark_result.txt

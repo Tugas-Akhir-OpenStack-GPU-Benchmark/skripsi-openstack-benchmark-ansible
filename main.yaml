@@ -1,5 +1,5 @@
 - name: Main
-  hosts: myservers
+  hosts: local
   become: True
   vars:
     base_path: /home/root

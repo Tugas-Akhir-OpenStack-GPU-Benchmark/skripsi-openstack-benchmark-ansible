@@ -1,0 +1,17 @@
+
+- name: run namd benchmark
+  async: 10000
+  poll: 5
+  expect:
+    timeout: 800
+    command: "{{ prime_run }} {{ phoronix_test_suite }} benchmark namd 2>&1"
+    responses:
+      'Would you like to save these test results': 'n'
+  register: namd_benchmark_result
+- set_fact:
+    cleaned_namd_benchmark_result: "{{ namd_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+- name: write namd benchmark logs
+  delegate_to: localhost
+  copy:
+    content: "{{ cleaned_namd_benchmark_result }}"
+    dest: temp/namd_benchmark_result.txt

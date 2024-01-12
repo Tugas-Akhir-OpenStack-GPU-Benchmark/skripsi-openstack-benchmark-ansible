@@ -1,88 +1,13 @@
-- name: Sudo update
-  command: "sudo apt-get install git -y"
-  args:
-    creates: /usr/bin/git
-- name: Prepare Phoronix folder
-  command: "mkdir {{ base_path }}/phoronix"
-  args:
-    creates: "{{ base_path }}/phoronix"
-- name: Download Phoronix
-  command: "git clone --depth=1 https://github.com/phoronix-test-suite/phoronix-test-suite.git \"{{ base_path }}/phoronix\""
-  args:
-    creates: "{{ base_path }}/phoronix/phoronix-test-suite"
-- name: Install PHP-CLI for phoronix
-  command: "sudo apt-get install php-cli -y"
-  args:
-    creates: "{{ base_path }}/php_is_installed"
-- name: Install php-xml for phoronix
-  command: "sudo apt-get install php-xml -y"
-  args:
-    creates: "{{ base_path }}/php_is_installed"
-- name: Install dos2unix
-  become: true
-  command: "apt-get install dos2unix -y"
-  delegate_to: localhost
-  args:
-    creates: "temp/dos2unix_is_installed"
-- name: Mark dos2unix installed
-  become: true
-  command: "touch \"temp/dos2unix_is_installed\""
-  delegate_to: localhost
-  args:
-    creates: "temp/dos2unix_is_installed"
-- name: Mark PHP as installed
-  command: "touch \"{{ base_path }}/php_is_installed\""
-  args:
-    creates: "{{ base_path }}/php_is_installed"
-- name: convert prime-run to linux just in case
-  command: "dos2unix \"{{ local_prime_run }}\""
-  delegate_to: localhost
-- name: copy prime-run
-  copy:
-    src: "{{ local_prime_run }}"
-    dest: "{{ prime_run }}"
-- name: chmod prime-run
-  file:
-    path: "{{ prime_run }}"
-    state: file
-    owner: root
-    group: root
-    mode: 0777
-- name: chmod phoronix
-  file:
-    path: "{{ phoronix_test_suite }}"
-    state: file
-    owner: root
-    group: root
-    mode: 0777
-- name: run glmark2 benchmark
-  command: "{{ prime_run }} {{ phoronix_test_suite }} benchmark glmark2 2>&1"
-  register: glmark2_benchmark_result
-- name: write glmark2 benchmark stdout logs
-  delegate_to: localhost
-  copy:
-    content: "{{ glmark2_benchmark_result.stdout }}"
-    dest: temp/glmark2_benchmark_result.txt
-- name: Install pip
-  apt:
-    update_cache: yes
-    name:
-      - python3-pip
+#### DEPENDENCIES
+- import_tasks: ./install_pexpect.yaml
+- import_tasks: ./download_phoronix.yaml
+- import_tasks: ./create_prime_run.yaml
 
-- name: Install pexpect
-  pip:
-    name: pexpect
-- name: run namd benchmark
-  expect:
-    command: "{{ prime_run }} {{ phoronix_test_suite }} benchmark namd 2>&1"
-    responses:
-      'Would you like to save these test results': 'n'
-  register: namd_benchmark_result
-- set_fact:
-    cleaned_namd_benchmark_result: "{{ namd_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
-- name: write namd benchmark logs
-  delegate_to: localhost
-  copy:
-    content: "{{ cleaned_namd_benchmark_result }}"
-    dest: temp/namd_benchmark_result.txt
+#### TASKS
+- import_tasks:
+    file: ./benchmark_glmark2.yaml
+- import_tasks:
+    file: ./benchmark_namd.yaml
+
+
 

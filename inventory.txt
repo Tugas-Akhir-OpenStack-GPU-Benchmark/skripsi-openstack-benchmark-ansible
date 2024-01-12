@@ -1,5 +1,8 @@
+[local]
+localhost ansible_connection=local ansible_user=root
+
 [myservers]
-ansible-target-1 ansible_host=34.64.234.245
+ansible-target-1 ansible_host=localhost
 
 [myservers:vars]
 ansible_connection=ssh
