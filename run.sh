@@ -1,0 +1,1 @@
+ansible-playbook  playbook.yaml -i inventory.txt --start-at-task="chmod phoronix"
