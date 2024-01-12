@@ -1,5 +1,5 @@
 - name: Main
-  hosts: local
+  hosts: gcp
   become: True
   vars:
     base_path: /home/root
@@ -10,4 +10,4 @@
     - name: ensure base_path is exists
       command: "mkdir -p {{ base_path }}"
     - name: Perform Benchmark
-      import_tasks: ./tasks/perform_benchmark.yaml
+      import_tasks: tasks/benchmark/perform_benchmark.yaml

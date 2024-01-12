@@ -1,10 +1,10 @@
 [local]
 localhost ansible_connection=local ansible_user=root
 
-[myservers]
-ansible-target-1 ansible_host=localhost
+[gcp]
+ansible-target-1 ansible_host=34.64.239.66
 
-[myservers:vars]
+[gcp:vars]
 ansible_connection=ssh
 ansible_user=immanuel01
 ansible_ssh_private_key_file=~/.ssh/gcp

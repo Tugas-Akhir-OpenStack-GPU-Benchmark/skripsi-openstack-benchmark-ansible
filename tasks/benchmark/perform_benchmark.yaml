@@ -1,0 +1,14 @@
+#### DEPENDENCIES
+- import_tasks: install_nvidia_smi.yaml
+- import_tasks: install_pexpect.yaml
+- import_tasks: download_phoronix.yaml
+- import_tasks: create_prime_run.yaml
+
+#### TASKS
+- import_tasks:
+    file: ./benchmark_glmark2.yaml
+- import_tasks:
+    file: ./benchmark_namd.yaml
+
+
+

@@ -1,0 +1,12 @@
+- name: Install dos2unix
+  become: true
+  command: "apt-get install dos2unix -y"
+  delegate_to: localhost
+  args:
+    creates: "temp/dos2unix_is_installed"
+- name: Mark dos2unix installed
+  become: true
+  command: "touch \"temp/dos2unix_is_installed\""
+  delegate_to: localhost
+  args:
+    creates: "temp/dos2unix_is_installed"
