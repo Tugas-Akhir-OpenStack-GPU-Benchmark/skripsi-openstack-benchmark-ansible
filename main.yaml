@@ -1,0 +1,13 @@
+- name: Main
+  hosts: myservers
+  become: True
+  vars:
+    base_path: /home/root
+    local_prime_run: "./data/prime-run"
+    prime_run: "{{ base_path }}/prime-run"
+    phoronix_test_suite: "{{ base_path }}/phoronix/phoronix-test-suite"
+  tasks:
+    - name: ensure base_path is exists
+      command: "mkdir -p {{ base_path }}"
+    - name: Perform Benchmark
+      import_tasks: ./tasks/perform_benchmark.yaml
