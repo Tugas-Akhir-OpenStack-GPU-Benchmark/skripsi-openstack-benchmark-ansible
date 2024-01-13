@@ -1,3 +1,4 @@
+# asia-northeast3-c
 - name: Main
   hosts: gcp
   become: True

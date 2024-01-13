@@ -2,9 +2,10 @@
 - name: run namd benchmark
   async: 10000
   poll: 5
+  become: false  # important, idk why
   expect:
     timeout: 800
-    command: "{{ prime_run }} {{ phoronix_test_suite }} benchmark namd 2>&1"
+    command: "{{ prime_run }} env DISPLAY=:0 {{ phoronix_test_suite }} benchmark namd-cuda 2>&1"
     responses:
       'Would you like to save these test results': 'n'
   register: namd_benchmark_result

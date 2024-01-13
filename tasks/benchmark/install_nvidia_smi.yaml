@@ -18,14 +18,48 @@
 
 ### TODO disable nouveau if exists (https://docs.kinetica.com/7.1/install/nvidia_deb/)
 
+
+#- name: "install nvcc (CUDA)"
+#  apt:
+#    update_cache: yes
+#    name:
+#      - xserver-xorg-video-nvidia-525
+#      - libnvidia-cfg1-525
+
+#- name: "install nvcc (CUDA)"
+#  apt:
+#    update_cache: yes
+#    name:
+#      - xvfb
+
+#- name: run Display Server
+#  command: "Xvfb :1 -screen 0 1024x768x16"
+#  async: true
+#  poll: 0
+
+- name: "install nvcc (CUDA)"
+  apt:
+    update_cache: yes
+    name:
+      - xauth
+      - xorg
+      - openbox
+
+
 - name: "Run nvidia.nvidia_driver Role"
   import_role:
     name: nvidia.nvidia_driver
   vars:
-    nvidia_driver_skip_reboot: yes
-    nvidia_driver_package_version: "546.33"
-    nvidia_driver_persistence_mode_on: no
+    nvidia_driver_skip_reboot: no
+#    nvidia_driver_package_version: "546.33"
+    nvidia_driver_persistence_mode_on: yes
 
+
+- name: "install nvcc (CUDA)"
+  apt:
+    update_cache: yes
+    name:
+      - nvidia-cuda-toolkit
 
 #- name: "Install dependencies"
 #  shell: |
