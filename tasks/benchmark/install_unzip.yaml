@@ -1,0 +1,5 @@
+- name: Install unzip
+  apt:
+    update_cache: yes
+    name:
+      - unzip

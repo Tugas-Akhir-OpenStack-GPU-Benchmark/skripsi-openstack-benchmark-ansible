@@ -1,10 +1,41 @@
+- set_fact:
+    namd_version: 'namd-cuda-1.1.1'
+
+- name: install phoronix namd-cuda
+  command: "env DISPLAY=:0 ./phoronix-test-suite install {{ namd_version }} 2>&1"
+  become: true
+  args:
+    chdir: "{{ phoronix_folder }}"
+
+- name: Set namd phoronix base directory  # specific for running phoronix as root  (become: true)
+  set_fact:
+    namd_test_folder: '/var/lib/phoronix-test-suite/installed-tests/pts/{{ namd_version }}'
+
+
+# Two tasks below need to be done manually because somehow the Phoronix's NAMD installation through ansible
+# is not working properly, although it works if we do SSH manually and *initiate* the phoronix NAMD installation manually
+
+
+- name: Prepare directory for NAMD testcase f1atpase.zip
+  ansible.builtin.file:
+    path: "{{ namd_test_folder }}/f1atpase"
+    state: directory
+
+- import_tasks: ./install_unzip.yaml
+
+- name: Extract NAMD testcase f1atpase.zip  #
+  unarchive:
+    src: "{{ namd_test_folder }}/f1atpase.zip"
+    dest: "{{ namd_test_folder }}"
+    remote_src: yes
 
 - name: run namd benchmark
   async: 10000
   poll: 5
-  become: false  # important, idk why
+  become: true
   expect:
     timeout: 800
+    chdir: "{{ phoronix_folder }}"
     command: "{{ prime_run }} env DISPLAY=:0 {{ phoronix_test_suite }} benchmark namd-cuda 2>&1"
     responses:
       'Would you like to save these test results': 'n'

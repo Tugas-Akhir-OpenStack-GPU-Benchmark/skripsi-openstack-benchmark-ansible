@@ -1,0 +1,23 @@
+- name: install phoronix pytorch
+  command: "env DISPLAY=:0 ./phoronix-test-suite install pytorch 2>&1"
+  become: true
+  args:
+    chdir: "{{ base_path }}"
+- name: run pytorch benchmark
+  async: 10000
+  poll: 5
+  become: true
+  expect:
+    timeout: 10
+    chdir: "{{ base_path }}"
+    command: "{{ prime_run }} env DISPLAY=:0 {{ phoronix_test_suite }} benchmark pytorch 2>&1"
+    responses:
+      'Would you like to save these test results': 'n'
+  register: pytorch_benchmark_result
+- set_fact:
+    cleaned_pytorch_benchmark_result: "{{ pytorch_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+- name: write pytorch benchmark logs
+  delegate_to: localhost
+  copy:
+    content: "{{ cleaned_pytorch_benchmark_result }}"
+    dest: temp/pytorch_benchmark_result.txt

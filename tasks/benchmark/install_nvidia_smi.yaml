@@ -26,12 +26,12 @@
 #      - xserver-xorg-video-nvidia-525
 #      - libnvidia-cfg1-525
 
-#- name: "install nvcc (CUDA)"
+#- name: "install In-memory/buffer display to simulate display monitor (subsitute for Nvidia Xorg server)"
 #  apt:
 #    update_cache: yes
 #    name:
 #      - xvfb
-
+#
 #- name: run Display Server
 #  command: "Xvfb :1 -screen 0 1024x768x16"
 #  async: true
