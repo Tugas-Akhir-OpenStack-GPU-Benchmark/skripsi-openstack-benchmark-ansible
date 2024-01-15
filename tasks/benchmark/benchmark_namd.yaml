@@ -35,8 +35,7 @@
   become: true
   expect:
     timeout: 800
-    chdir: "{{ phoronix_folder }}"
-    command: "{{ prime_run }} env DISPLAY=:0 {{ phoronix_test_suite }} benchmark namd-cuda 2>&1"
+    command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=2 DISPLAY=:0 {{ phoronix_test_suite }} benchmark namd-cuda 2>&1"
     responses:
       'Would you like to save these test results': 'n'
   register: namd_benchmark_result

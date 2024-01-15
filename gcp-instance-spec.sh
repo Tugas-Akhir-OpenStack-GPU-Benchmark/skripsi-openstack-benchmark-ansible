@@ -1,6 +1,6 @@
 ## instance spec I used when I'm developing this ansible script
 
-gcloud compute instances create instance-3 \
+gcloud compute instances create instance-4 \
     --project=law-2006463162 \
     --zone=asia-northeast3-c \
     --machine-type=custom-4-8448 \
@@ -11,7 +11,7 @@ gcloud compute instances create instance-3 \
     --scopes=https://www.googleapis.com/auth/cloud-platform \
     --accelerator=count=1,type=nvidia-tesla-t4 \
     --tags=http-server,https-server,lb-health-check \
-    --create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20240110,mode=rw,size=25,type=projects/law-2006463162/zones/us-central1-a/diskTypes/pd-balanced \
+    --create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20240110,mode=rw,size=30,type=projects/law-2006463162/zones/us-central1-a/diskTypes/pd-balanced \
     --no-shielded-secure-boot \
     --shielded-vtpm \
     --shielded-integrity-monitoring \

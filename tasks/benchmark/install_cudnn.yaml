@@ -1,0 +1,64 @@
+# See: https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html
+- set_fact:
+    miniconda_isntaller_file: "{{ base_path }}/Miniconda3-latest-Linux-x86_64.sh"
+    miniconda_install_path: "{{ base_path }}/miniconda3"
+    cudnn_version: "7.6.5"
+    cuda_version: "cuda10.1_0"
+- name: Download miniconda installer  # miniconda version during development: 23.11.0-1
+  ansible.builtin.get_url:
+    url: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    dest: "{{ miniconda_isntaller_file }}"
+    mode: '0777'
+
+- name: Install miniconda
+  command: "{{ miniconda_isntaller_file }} -b -p \"{{ miniconda_install_path }}\""
+  register: install_miniconda_output
+  args:
+    creates: "{{ miniconda_install_path }}"
+- debug:
+    msg: "{{ install_miniconda_output.stdout }}"
+
+- name: install zlib
+  apt:
+    update_cache: yes
+    name:
+      - zlib1g  # ubuntu
+
+- name: additional cudnn-installation helper constants
+  set_fact:
+    miniconda_cmd: "{{ miniconda_install_path }}/bin/conda"
+    cudnn_installation_path: "{{ miniconda_install_path }}/pkgs/cudnn-{{ cudnn_version }}-{{ cuda_version }}"
+    cudnn_zip_file: "{{ base_path }}/cudnn-local-repo-ubuntu2004-8.9.7.29_1.0-1_amd64.deb"
+
+
+#- name: Create conda env
+#  command: "{{ miniconda_cmd }} create --name myenv -y"
+#- name: Init conda env
+#  command: "{{ miniconda_cmd }} init"
+#- name: Activate conda env
+#  command: "{{ miniconda_cmd }} activate myenv"
+
+- name: Install cudnn
+  command: "{{ miniconda_cmd }} install -c anaconda cudnn={{ cudnn_version }}={{ cuda_version }} -y"
+  register: install_cudnn_output
+- debug:
+    msg: "{{ install_cudnn_output }}"
+- name: Create folder for cudnn-global
+  ansible.builtin.file:
+    path: "/usr/local/cuda"
+    state: directory
+
+- name: Copy cudnn to be globally-available - include
+  copy:
+    src: "{{ cudnn_installation_path }}/include/"
+    dest: "/usr/local/cuda/include/"
+    remote_src: yes
+    mode: '0777'
+- name: Copy cudnn to be globally-available - lib
+  copy:
+    src: "{{ cudnn_installation_path }}/lib/"
+    dest: "/usr/local/cuda/lib64/"
+    remote_src: yes
+    mode: '0777'
+
+

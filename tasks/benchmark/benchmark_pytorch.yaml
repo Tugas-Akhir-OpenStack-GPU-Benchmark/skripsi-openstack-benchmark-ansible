@@ -1,19 +1,45 @@
+- name: install cuDNN
+  import_tasks:
+    file: ./install_cudnn.yaml
+
 - name: install phoronix pytorch
   command: "env DISPLAY=:0 ./phoronix-test-suite install pytorch 2>&1"
-  become: true
+  become: false  # important so that the Nvidia CUDNN detected
   args:
-    chdir: "{{ base_path }}"
+    chdir: "{{ phoronix_folder }}"
+
+
 - name: run pytorch benchmark
-  async: 10000
+  async: 100000
   poll: 5
-  become: true
+  become: false  # important so that the Nvidia CUDNN detected
   expect:
-    timeout: 10
-    chdir: "{{ base_path }}"
-    command: "{{ prime_run }} env DISPLAY=:0 {{ phoronix_test_suite }} benchmark pytorch 2>&1"
+    timeout: 100000
+    command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=1 DISPLAY=:0 {{ phoronix_test_suite }} benchmark pytorch 2>&1"
     responses:
       'Would you like to save these test results': 'n'
+      'Batch Size:': '3'
+      'Model:': '4'
   register: pytorch_benchmark_result
+
+#  1: 1
+#  2: 16
+#  3: 32
+#  4: 64
+#  5: 256
+#  6: 512
+#  7: Test All Options
+#  ** Multiple items can be selected, delimit by a comma. **
+#  Batch Size:
+
+#  1: ResNet-50
+#  2: ResNet-152
+#  3: Efficientnet_v2_l
+#  4: Test All Options
+#  ** Multiple items can be selected, delimit by a comma. **
+#  Model:
+
+
 - set_fact:
     cleaned_pytorch_benchmark_result: "{{ pytorch_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
 - name: write pytorch benchmark logs

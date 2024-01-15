@@ -6,9 +6,9 @@
 
 #### TASKS
 - import_tasks:
-      file: ./benchmark_namd.yaml
+    file: ./benchmark_pytorch.yaml
 - import_tasks:
-      file: ./benchmark_pytorch.yaml
+      file: ./benchmark_namd.yaml
 - import_tasks:
     file: ./benchmark_glmark2.yaml
 
