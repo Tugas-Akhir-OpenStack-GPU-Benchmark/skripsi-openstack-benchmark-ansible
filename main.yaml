@@ -8,6 +8,11 @@
     prime_run: "{{ base_path }}/prime-run"
     phoronix_folder: "{{ base_path }}/phoronix"
     phoronix_test_suite: "{{ phoronix_folder }}/phoronix-test-suite"
+
+    ### USER CONFIGURABLE VARS. See README.md
+    distro: "ubuntu2004"
+    arch: "x86_64"
+
   tasks:
     - name: ensure base_path is exists
       command: "mkdir -p {{ base_path }}"

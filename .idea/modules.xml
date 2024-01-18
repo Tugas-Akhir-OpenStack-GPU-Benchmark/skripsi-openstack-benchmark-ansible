@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../../../01_Kuliah/01_Dokumen/20 - Tugas Akhir Skripsi/02 ubuntu-cudnn/.idea/02 ubuntu-cudnn.iml" filepath="$PROJECT_DIR$/../../../../01_Kuliah/01_Dokumen/20 - Tugas Akhir Skripsi/02 ubuntu-cudnn/.idea/02 ubuntu-cudnn.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../aws-ansible-practice/.idea/ansible-practice.iml" filepath="$PROJECT_DIR$/../../aws-ansible-practice/.idea/ansible-practice.iml" />
       <module fileurl="file://$PROJECT_DIR$/skripsi.iml" filepath="$PROJECT_DIR$/skripsi.iml" />
     </modules>

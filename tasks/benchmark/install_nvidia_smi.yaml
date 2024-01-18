@@ -37,8 +37,7 @@
 #  async: true
 #  poll: 0
 
-- name: "install nvcc (CUDA)"
-  apt:
+- apt:
     update_cache: yes
     name:
       - xauth
@@ -55,11 +54,44 @@
     nvidia_driver_persistence_mode_on: yes
 
 
+
+# instead of installing in /usr/local/cuda, it will install in various folder (see dpkg -L nvidia-cuda-toolkit | grep include)
+# which will make cudnn's assertion error (sudo make clean && sudo make at cudnn_samples_v8/mnistCUDNN)
+# So we need to create symlink
 - name: "install nvcc (CUDA)"
   apt:
     update_cache: yes
     name:
       - nvidia-cuda-toolkit
+
+- name: "install libfreeimage"  # for cudnn_samples_v8/mnistCUDNN
+  apt:
+    update_cache: yes
+    name:
+      - libfreeimage3
+      - libfreeimage-dev
+
+- file:
+    path: "/usr/local/cuda"
+    state: directory
+
+# dpkg -L nvidia-cuda-toolkit | grep include
+# To fix missing /usr/local/cuda/include/cuda.h
+- name: Create symbolic link to fix cudnn
+  file:
+    src: "/usr/include"
+    dest: "/usr/local/cuda/include"
+    state: link
+
+# dpkg -L nvidia-cuda-toolkit | grep bin
+# To fix missing /usr/local/cuda/bin/nvcc
+- name: Create symbolic link to fix cudnn (2)
+  file:
+    src: "/usr/bin"
+    dest: "/usr/local/cuda/bin"
+    state: link
+
+
 
 #- name: "Install dependencies"
 #  shell: |

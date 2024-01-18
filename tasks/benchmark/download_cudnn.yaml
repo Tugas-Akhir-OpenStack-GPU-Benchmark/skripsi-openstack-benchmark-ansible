@@ -1,0 +1,40 @@
+## Download CUDNN installer from my github repository
+## Should this command fails (for example I deleted the github repository), you can substitute this file
+## By downloading cudnn-local-repo-ubuntu2004-8.9.7.29_1.0-1_arm64.deb file from Nvidia's site, and put the file
+## on remote host
+
+- import_tasks: ../install_dos2unix.yaml
+
+- command: "dos2unix ./tasks/benchmark/scripts/downloader.py"
+  delegate_to: localhost
+- name: Upload CUDNN download script
+  copy:
+    src: ./scripts/downloader.py
+    dest: "{{ base_path }}/downloader.py"
+- file:
+    path: "{{ base_path }}/downloader.py"
+    state: file
+    owner: root
+    group: root
+    mode: 0777
+
+- command: "dos2unix ./tasks/benchmark/scripts/combiner.py"
+  delegate_to: localhost
+- name: Upload CUDNN combine script
+  copy:
+    src: ./scripts/combiner.py
+    dest: "{{ base_path }}/combiner.py"
+- file:
+    path: "{{ base_path }}/combiner.py"
+    state: file
+    owner: root
+    group: root
+    mode: 0777
+- name: Download CUDNN installer parts from GitHub
+  command: "{{ base_path }}/downloader.py 2>&1 > ~/download-log.txt"
+  args:
+    chdir: "{{ base_path }}"
+- name: Combine downloaded CUDNN installer
+  command: "{{ base_path }}/combiner.py"
+  args:
+    chdir: "{{ base_path }}"
