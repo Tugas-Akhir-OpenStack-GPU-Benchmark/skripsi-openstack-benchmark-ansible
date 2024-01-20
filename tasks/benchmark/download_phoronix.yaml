@@ -2,12 +2,13 @@
   command: "sudo apt-get install git -y"
   args:
     creates: /usr/bin/git
+- import_tasks: ./install_unzip.yaml
 - name: Prepare Phoronix folder
   command: "mkdir {{ base_path }}/phoronix"
   args:
     creates: "{{ base_path }}/phoronix"
-- name: Download Phoronix
-  command: "git clone --depth=1 https://github.com/phoronix-test-suite/phoronix-test-suite.git \"{{ base_path }}/phoronix\""
+- name: Download Phoronix v10.8.4
+  command: "git clone --depth=1 --branch v10.8.4 https://github.com/phoronix-test-suite/phoronix-test-suite.git \"{{ base_path }}/phoronix\""
   args:
     creates: "{{ base_path }}/phoronix/phoronix-test-suite"
 - name: Install PHP-CLI for phoronix

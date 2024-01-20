@@ -2,7 +2,7 @@
 localhost ansible_connection=local ansible_user=root
 
 [gcp]
-ansible-target-1 ansible_host=34.64.104.174
+ansible-target-1 ansible_host=34.64.60.12
 
 [gcp:vars]
 ansible_connection=ssh

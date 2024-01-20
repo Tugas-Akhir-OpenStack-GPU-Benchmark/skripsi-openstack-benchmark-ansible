@@ -1,5 +1,5 @@
 [target]
-target1 ansible_host=34.64.168.249
+target1 ansible_host=34.64.60.12
 
 [target:vars]
 ansible_connection=ssh

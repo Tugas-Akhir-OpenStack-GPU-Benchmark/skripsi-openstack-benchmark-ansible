@@ -1,4 +1,4 @@
-- name: "install nvcc (CUDA)"
+- name: "install libpng16-16"
   apt:
     update_cache: yes
     name:
@@ -7,7 +7,7 @@
 - name: run glmark2 benchmark
   async: 10000
   poll: 5
-  become: false  # important, idk why
+  become: true
   expect:
     timeout: 670
     command: "{{ prime_run }} env DISPLAY=:0 {{ phoronix_test_suite }} benchmark glmark2 2>&1"

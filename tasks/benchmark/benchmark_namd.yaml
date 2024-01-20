@@ -1,6 +1,3 @@
-- set_fact:
-    namd_version: 'namd-cuda-1.1.1'
-
 - name: install phoronix namd-cuda
   command: "env DISPLAY=:0 ./phoronix-test-suite install {{ namd_version }} 2>&1"
   become: true
@@ -21,8 +18,6 @@
     path: "{{ namd_test_folder }}/f1atpase"
     state: directory
 
-- import_tasks: ./install_unzip.yaml
-
 - name: Extract NAMD testcase f1atpase.zip  #
   unarchive:
     src: "{{ namd_test_folder }}/f1atpase.zip"
@@ -35,7 +30,7 @@
   become: true
   expect:
     timeout: 800
-    command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=2 DISPLAY=:0 {{ phoronix_test_suite }} benchmark namd-cuda 2>&1"
+    command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=5 DISPLAY=:0 {{ phoronix_test_suite }} benchmark namd-cuda 2>&1"
     responses:
       'Would you like to save these test results': 'n'
   register: namd_benchmark_result

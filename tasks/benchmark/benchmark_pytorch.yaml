@@ -2,25 +2,60 @@
   import_tasks:
     file: ./install_cudnn.yaml
 
+- name: Set PyTorch phoronix base directory  # specific for running phoronix as root  (become: true)
+  set_fact:
+    pytorch_profile_folder: '/var/lib/phoronix-test-suite/test-profiles/pts/{{ pytorch_phoronix_test_version }}'
+
+- debug:
+    msg: "env DISPLAY=:0 ./phoronix-test-suite install {{ pytorch_phoronix_test_version }} 2>&1"
+
 - name: install phoronix pytorch
-  command: "env DISPLAY=:0 ./phoronix-test-suite install pytorch 2>&1"
-  become: false  # important so that the Nvidia CUDNN detected
+  command: "env DISPLAY=:0 ./phoronix-test-suite install {{ pytorch_phoronix_test_version }} 2>&1"
+  become: true
   args:
     chdir: "{{ phoronix_folder }}"
+  register: pytorch_install_result
+- set_fact:
+    cleaned_pytorch_install_result: "{{ pytorch_install_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+- name: write pytorch install logs
+  delegate_to: localhost
+  copy:
+    content: "{{ cleaned_pytorch_install_result }}"
+    dest: temp/pytorch_install_result.txt
 
 
-- name: run pytorch benchmark
-  async: 100000
+# Phoronix did validation for test-definition options that contains substring "nvidia" and "cuda". However,
+# They did the validation by checking the GPU model of current system, check if the model name contains "nvidia"
+# However this is not the case for Google Cloud PLatform's GPU which is Nvidia but the model name is "Tesla T4 15GB",
+# no nvidia substring in it. That issue doesn't allow us to choose between GPU vs CPU.
+# (See https://github.com/phoronix-test-suite/phoronix-test-suite/issues/771 )
+- name: replace PyTorch test-definition.xml to bypass Phoronix's faulty Nvidia validation
+  copy:
+    src: ./test-profiles/pytorch-test-definition.xml
+    dest: "{{ pytorch_profile_folder }}/test-definition.xml"
+
+
+- name: run pytorch benchmark  # Will run for about 35 minutes
+  async: 1000000
   poll: 5
-  become: false  # important so that the Nvidia CUDNN detected
+  become: true
+  ignore_errors: yes
   expect:
-    timeout: 100000
-    command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=1 DISPLAY=:0 {{ phoronix_test_suite }} benchmark pytorch 2>&1"
+    timeout: 1000000
+    command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=3 DISPLAY=:0 {{ phoronix_test_suite }} benchmark {{ pytorch_phoronix_test_version }} 2>&1"
     responses:
       'Would you like to save these test results': 'n'
-      'Batch Size:': '3'
+      'Batch Size:': '1,2,4,6'
       'Model:': '4'
+      'Device:': 'gpu'
   register: pytorch_benchmark_result
+
+
+# 1: CPU
+# 2: gpu
+# 3: Test All Options
+# ** Multiple items can be selected, delimit by a comma. **
+# Device:
 
 #  1: 1
 #  2: 16
