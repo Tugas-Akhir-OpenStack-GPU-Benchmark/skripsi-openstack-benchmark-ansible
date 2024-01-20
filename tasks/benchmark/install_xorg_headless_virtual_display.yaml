@@ -1,0 +1,54 @@
+### See https://linuxhint.com/install-nvidia-gpu-drivers-headless-ubuntu-server-22-04-lts/
+### and https://www.cyberciti.biz/faq/ubuntu-linux-install-nvidia-driver-latest-proprietary-driver/
+### and https://askubuntu.com/a/463000/1058660 / https://askubuntu.com/questions/453109/add-fake-display-when-no-monitor-is-plugged-in
+###
+
+## Seems to successfully run `sudo ./prime-run env DISPLAY=:1 glmark2`
+## Tapi belum uji coba complete-reset untuk uji coba ansible-nya
+
+- name: "install nvcc (CUDA)"
+  apt:
+    update_cache: yes
+    name:
+      - xserver-xorg-video-nvidia-525
+      - libnvidia-cfg1-525
+
+- name: "install nvcc (CUDA)"
+  apt:
+    update_cache: yes
+    name:
+      - nvidia-driver-525
+      - nvidia-dkms-525
+
+- name: "install nvcc (CUDA)"
+  apt:
+    update_cache: yes
+    name:
+      -  nvidia-driver-525-server
+
+- name: "install nvcc (CUDA)"
+  apt:
+    update_cache: yes
+    name:
+      - xserver-xorg-video-dummy
+      - glmark2
+
+# `sudo ./prime-run env DISPLAY=:1 glmark2`
+- name: run Display Server
+  command: "Xorg :1"
+  become: true
+  async: true
+  poll: 0
+
+
+
+#- name: "install In-memory/buffer display to simulate display monitor (subsitute for Nvidia Xorg server)"
+#  apt:
+#    update_cache: yes
+#    name:
+#      - xvfb
+#
+#- name: run Display Server
+#  command: "Xvfb :1 -screen 0 1024x768x16"
+#  async: true
+#  poll: 0

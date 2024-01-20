@@ -1,3 +1,5 @@
+
+
 - name: install phoronix namd-cuda
   command: "env DISPLAY=:0 ./phoronix-test-suite install {{ namd_version }} 2>&1"
   become: true

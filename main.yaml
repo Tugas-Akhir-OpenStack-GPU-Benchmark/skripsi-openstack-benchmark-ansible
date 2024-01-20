@@ -8,6 +8,8 @@
     prime_run: "{{ base_path }}/prime-run"
     phoronix_folder: "{{ base_path }}/phoronix"
     phoronix_test_suite: "{{ phoronix_folder }}/phoronix-test-suite"
+
+    glmark2_version: 'glmark2-1.4.0'
     namd_version: 'namd-cuda-1.1.1'
     pytorch_phoronix_test_version: "pytorch-1.0.1"
 

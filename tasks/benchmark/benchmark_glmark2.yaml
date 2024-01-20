@@ -1,8 +1,21 @@
+- import_tasks: ./install_xorg_headless_virtual_display.yaml
+
+
+### TODO migrate from phoronix to direct apt-get installation
+
+
 - name: "install libpng16-16"
   apt:
     update_cache: yes
     name:
       - libpng16-16
+
+- name: install phoronix glmark2
+  command: "env DISPLAY=:1 ./phoronix-test-suite install {{ glmark2_version }} 2>&1"
+  become: true
+  args:
+    chdir: "{{ phoronix_folder }}"
+
 
 - name: run glmark2 benchmark
   async: 10000
@@ -10,7 +23,7 @@
   become: true
   expect:
     timeout: 670
-    command: "{{ prime_run }} env DISPLAY=:0 {{ phoronix_test_suite }} benchmark glmark2 2>&1"
+    command: "{{ prime_run }} env DISPLAY=:1 {{ phoronix_test_suite }} benchmark glmark2 2>&1"
     responses:
       'Resolution:': 4  # 1280 x 960
       'Would you like to save these test results': 'n'
