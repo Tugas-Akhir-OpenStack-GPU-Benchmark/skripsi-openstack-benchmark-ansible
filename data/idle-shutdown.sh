@@ -8,7 +8,7 @@ threshold=0.05
 printf "Hello, starting up at $(date) \n" >> log.txt
 
 count=0
-wait_minutes=17
+wait_minutes=20
 while true
 do
 
@@ -17,11 +17,16 @@ do
   res=$(echo $load'<'$threshold | bc -l)
   if (( $res ))
   then
-    echo "Idling..." >> log.txt
     ((count+=1))
   else
+    ((count-=3))
+  fi
+
+  if [ "$count" -lt "0" ]
+  then
     count=0
   fi
+
   echo "Idle minutes count = $count. Load = $load" >> log.txt
 
   if (( count>wait_minutes ))
@@ -30,9 +35,14 @@ do
     echo Shutting down
     printf "Queue for shutting down at $(date) \n" >> log.txt
     # wait a little bit more before actually pulling the plug
-    sleep 300
+
+    sudo wall "System is scheduled to shutdown for about 3 minutes later from now"
+
+    sleep 170
     printf "Hello, shutting down at $(date) \n" >> log.txt
-    sudo poweroff
+    sudo wall "shutting down..."
+    sleep 10
+    sudo poweroff &
   fi
 
   sleep 60
