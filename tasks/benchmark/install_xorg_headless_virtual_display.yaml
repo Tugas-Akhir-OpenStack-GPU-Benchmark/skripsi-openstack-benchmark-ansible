@@ -33,13 +33,6 @@
       - xserver-xorg-video-dummy
       - glmark2
 
-# `sudo ./prime-run env DISPLAY=:1 glmark2`
-- name: run Display Server
-  command: "Xorg :1"
-  become: true
-  async: true
-  poll: 0
-
 
 
 #- name: "install In-memory/buffer display to simulate display monitor (subsitute for Nvidia Xorg server)"

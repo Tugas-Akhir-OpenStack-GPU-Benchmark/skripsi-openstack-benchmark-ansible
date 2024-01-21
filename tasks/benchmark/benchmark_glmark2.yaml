@@ -10,26 +10,46 @@
     name:
       - libpng16-16
 
+# `sudo ./prime-run env DISPLAY=:1 glmark2`
+- name: run Xorg Display Server
+  command: "Xorg :1"
+  become: true
+  async: true
+  poll: 0
+
 - name: install phoronix glmark2
-  command: "env DISPLAY=:1 ./phoronix-test-suite install {{ glmark2_version }} 2>&1"
+  command: "{{ prime_run }} env DISPLAY=:1 glmark2"
   become: true
   args:
     chdir: "{{ phoronix_folder }}"
-
-
-- name: run glmark2 benchmark
-  async: 10000
-  poll: 5
-  become: true
-  expect:
-    timeout: 670
-    command: "{{ prime_run }} env DISPLAY=:1 {{ phoronix_test_suite }} benchmark glmark2 2>&1"
-    responses:
-      'Resolution:': 4  # 1280 x 960
-      'Would you like to save these test results': 'n'
   register: glmark2_benchmark_result
+
+
+
+#- name: install phoronix glmark2
+#  command: "env DISPLAY=:1 ./phoronix-test-suite install {{ glmark2_version }} 2>&1"
+#  become: true
+#  args:
+#    chdir: "{{ phoronix_folder }}"
+#
+#
+#- name: run glmark2 benchmark
+#  async: 10000
+#  poll: 5
+#  become: true
+#  expect:
+#    timeout: 670
+#    command: "{{ prime_run }} env DISPLAY=:1 {{ phoronix_test_suite }} benchmark glmark2 2>&1"
+#    responses:
+#      'Resolution:': 4  # 1280 x 960
+#      'Would you like to save these test results': 'n'
+#  register: glmark2_benchmark_result
+
+
 - set_fact:
     cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+
+
 - name: write glmark2 benchmark stdout logs
   delegate_to: localhost
   copy:
