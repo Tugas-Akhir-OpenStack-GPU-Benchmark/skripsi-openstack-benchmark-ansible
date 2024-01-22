@@ -1,3 +1,3 @@
 
 # need trailing comma
-ansible-playbook auto_turnoff.yaml -i auto_turnoff_inventory.txt
+ansible-playbook auto_turnoff.yaml -i auto_turnoff_inventory.txt -e "ansible_host=$1"
