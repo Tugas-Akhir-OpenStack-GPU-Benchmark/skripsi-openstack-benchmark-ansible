@@ -4,6 +4,9 @@
   delegate_to: localhost
   args:
     creates: "temp/dos2unix_is_installed"
+- name: ensure temp folder exists
+  command: "mkdir -p temp"
+  delegate_to: localhost
 - name: Mark dos2unix installed
   become: true
   command: "touch \"temp/dos2unix_is_installed\""

@@ -4,7 +4,7 @@
   become: True
   vars:
     base_path: /home/root
-    local_prime_run: "./data/prime-run"
+    local_prime_run: "./scripts/prime-run"
     prime_run: "{{ base_path }}/prime-run"
     phoronix_folder: "{{ base_path }}/phoronix"
     phoronix_test_suite: "{{ phoronix_folder }}/phoronix-test-suite"
@@ -21,4 +21,4 @@
     - name: ensure base_path is exists
       command: "mkdir -p {{ base_path }}"
     - name: Perform Benchmark
-      import_tasks: tasks/benchmark/perform_benchmark.yaml
+      import_tasks: perform_benchmark.yaml

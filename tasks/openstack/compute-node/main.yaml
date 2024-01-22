@@ -1,0 +1,12 @@
+# asia-northeast3-c
+- name: Main
+  hosts: gcp
+  become: True
+  vars:
+    base_path: /home/root
+
+  tasks:
+    - name: ensure base_path is exists
+      command: "mkdir -p {{ base_path }}"
+    - name: Install MariaDB
+      import_tasks: ./config-mariadb.yaml

@@ -17,8 +17,8 @@
   async: true
   poll: 0
 
-- name: install phoronix glmark2
-  command: "{{ prime_run }} env DISPLAY=:1 glmark2"
+- name: run glmark2 benchmarking
+  command: "{{ prime_run }} env DISPLAY=:1 glmark2 2>&1"
   become: true
   args:
     chdir: "{{ phoronix_folder }}"
