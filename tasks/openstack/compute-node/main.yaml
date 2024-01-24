@@ -1,6 +1,6 @@
 # asia-northeast3-c
 - name: Main
-  hosts: gcp
+  hosts: controller_instance
   become: True
   vars:
     base_path: /home/root
@@ -8,5 +8,6 @@
   tasks:
     - name: ensure base_path is exists
       command: "mkdir -p {{ base_path }}"
-    - name: Install MariaDB
-      import_tasks: ./config-mariadb.yaml
+    - name: install keystone
+      import_role:
+        name: "../roles/keystone"

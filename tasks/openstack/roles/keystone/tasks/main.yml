@@ -1,0 +1,5 @@
+---
+# tasks file for keystone
+- block:
+    - import_tasks: ./prerequisite/install_mariadb.yml
+  become: true

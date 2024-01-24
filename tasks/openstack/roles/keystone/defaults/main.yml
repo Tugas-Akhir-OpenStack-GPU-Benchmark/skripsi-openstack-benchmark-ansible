@@ -1,0 +1,5 @@
+---
+# defaults file for keystone
+
+# can be anything, not only hexs, but please don't use double quote character
+mariadb_root_password: "71BBE5F9E5E6FD118730A83F77B3EACF"
