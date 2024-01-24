@@ -11,7 +11,10 @@
 
 - name: Running mysql_secure_installation
   become: true
-  shell:  "echo -e \"{{ mariadb_root_password }}\\nn\\ny\\nn\\nn\\ny\\n\" | (mysql_secure_installation 2>&1)"
+#  shell:  "echo -e \"{{ mariadb_root_password }}\\nn\\ny\\nn\\nn\\ny\\n\" | (mysql_secure_installation 2>&1)"
+  shell:  "mysql_secure_installation 2>&1"
+  args:
+    stdin: "{{ mariadb_root_password }}\nn\ny\nn\nn\ny\n"
   timeout: 20
   register: mysql_secure_installation_result
   ignore_errors: true

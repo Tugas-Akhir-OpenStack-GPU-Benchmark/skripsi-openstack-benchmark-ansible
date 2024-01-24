@@ -1,5 +1,11 @@
 ---
 # tasks file for keystone
+# See https://docs.openstack.org/keystone/queens/install/keystone-install-ubuntu.html#install-and-configure-components
+
 - block:
     - import_tasks: ./prerequisite/install_mariadb.yml
+    - import_tasks: ./prerequisite/configure_mariadb.yml
+    - import_tasks: ./install_and_configure_components.yml
   become: true
+
+

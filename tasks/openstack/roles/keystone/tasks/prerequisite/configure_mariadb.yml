@@ -1,0 +1,20 @@
+---
+
+- set_fact:
+    sql_query: "CREATE DATABASE IF NOT EXISTS keystone;"
+- name: create keystone table through MariaDB
+  command: "mysql -u root --password=\"{{ keystone_db_password }}\" -e \"{{ sql_query }}\""
+  become: true
+
+- set_fact:
+    sql_query: "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY '{{ keystone_db_password }}';"
+- name: Grant all privileges on keystone.* to keystone@localhost
+  command: "mysql -u root --password=\"{{ keystone_db_password }}\" -e \"{{ sql_query }}\""
+  become: true
+
+- set_fact:
+    sql_query: "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '{{ keystone_db_password }}';"
+- name: Grant all privileges on keystone.* to keystone@%
+  command: "mysql -u root --password=\"{{ keystone_db_password }}\" -e \"{{ sql_query }}\""
+  become: true
+

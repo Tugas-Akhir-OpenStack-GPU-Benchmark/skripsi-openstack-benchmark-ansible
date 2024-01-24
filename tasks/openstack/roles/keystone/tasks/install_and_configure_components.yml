@@ -1,0 +1,52 @@
+---
+
+# TODO set static versions
+
+#- name: "Install dependencies package"
+#  become: true
+#  apt:
+#    update_cache: yes
+#    name:
+#      - libapache2-mod-wsgi-py3
+#
+#- name: "Install keystone, apache2, libapache2-mod-wsgi"
+#  become: true
+#  apt:
+#    update_cache: yes
+#    name:
+#      - libapache2-mod-wsgi
+#      - apache2
+#      - keystone
+
+- name: "Install libapache2-mod-wsgi-py3"
+  command: "apt-get install libapache2-mod-wsgi-py3 -y"
+- name: "Install libapache2-mod-wsgi"
+  command: "apt-get install libapache2-mod-wsgi -y"
+- name: "Install apache2"
+  command: "apt-get install apache2 -y"
+- name: "Install keystone"
+  command: "apt-get install keystone -y"
+
+
+#- name: Modify /etc/keystone/keystone.conf
+#  ansible.builtin.script: "configure_keystone_conf.py \"{{ keystone_db_password }}\""
+
+- set_fact:
+    files_path__keystone_module: "{{ role_path }}/files"
+
+- name: backup keystone config file
+  copy:
+    src: /etc/keystone/keystone.conf
+    dest: /etc/keystone/keystone.conf.bak
+    remote_src: true
+
+
+- import_role:
+    name: "{{ role_path }}/../local_script_on_remote"
+  vars:
+    # we need to store it to specific variable first because the `role_path` will be **lazily** evaluated,
+    # which may cause bug (file not found)
+    local_dir: "{{ files_path__keystone_module }}"
+    local_script_name: 'configure_keystone_conf.py'
+    arguments: "\"{{ keystone_db_password }}\""
+

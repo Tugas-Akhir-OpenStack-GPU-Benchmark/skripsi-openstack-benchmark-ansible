@@ -1,5 +1,6 @@
 ---
 # defaults file for keystone
 
-# can be anything, not only hexs, but please don't use double quote character
+# can be anything, not only hexs, but please don't use double quote character, single quote character, or backslash
 mariadb_root_password: "71BBE5F9E5E6FD118730A83F77B3EACF"
+keystone_db_password: "034F3C557ECEF6CCEF9438AD0438B3B5"
