@@ -1,0 +1,8 @@
+---
+# defaults file for local_script_on_remote
+local_dir: ''
+local_script_name: ''
+arguments: ''
+become: true
+remote_script_dir: '/home/temp'
+convert_windows_based_line_separator_to_linux_based: yes
