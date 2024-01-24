@@ -50,3 +50,107 @@
     local_script_name: 'configure_keystone_conf.py'
     arguments: "\"{{ keystone_db_password }}\""
 
+- name: Populate the Identity service database
+  command: "su -s /bin/sh -c \"keystone-manage db_sync\" keystone"
+
+- name: Initialize Fernet key repositories (fernet_setup)
+  command: "keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone"
+
+- name: Initialize Fernet key repositories (credential_setup)
+  command: "keystone-manage credential_setup --keystone-user keystone --keystone-group keystone"
+
+- name: Bootstrap the Identity service
+  command: "keystone-manage bootstrap --bootstrap-password {{ keystone_admin_password }} --bootstrap-admin-url {{ keystone_url }} --bootstrap-internal-url {{ keystone_url }} --bootstrap-public-url {{ keystone_url }} --bootstrap-region-id RegionOne"
+
+
+
+
+- name: Check if  is already defined
+  lineinfile:
+    state: absent
+    path: "/etc/apache2/apache2.conf"
+    regexp: "^ServerName controller="
+  check_mode: true
+  changed_when: false # This just makes things look prettier in the logs
+  register: check
+- name: Define ServerName controller if undefined
+  lineinfile:
+    state: present
+    path: "/etc/apache2/apache2.conf"
+    line: "ServerName controller"
+  when: check.found == 0
+
+
+- name: Append ServerName controller
+  import_role:
+    name: "{{ role_path }}/../insert_line_if_line_not_exists"
+  vars:
+    target_file_path: '/etc/apache2/apache2.conf'
+    regexp_checker: '^ServerName controller'
+    content_to_be_appended: 'ServerName controller'
+
+- name: "Finalize the installation"
+  command: "service apache2 restart"
+
+
+- set_fact:
+    target_profile_script: "/root/.profile"
+
+
+- name: Add OS_USERNAME to Env variable
+  import_role:
+    name: "{{ role_path }}/../insert_line_if_line_not_exists"
+  vars:
+    target_file_path: '{{ target_profile_script }}'
+    regexp_checker: '^export OS_USERNAME='
+    content_to_be_appended: 'export OS_USERNAME=admin'
+
+- name: Add OS_PASSWORD to Env variable
+  import_role:
+    name: "{{ role_path }}/../insert_line_if_line_not_exists"
+  vars:
+    target_file_path: '{{ target_profile_script }}'
+    regexp_checker: '^export OS_PASSWORD='
+    content_to_be_appended: 'export OS_PASSWORD=\"{{ keystone_admin_password }}\"'
+
+- name: Add OS_PROJECT_NAME to Env variable
+  import_role:
+    name: "{{ role_path }}/../insert_line_if_line_not_exists"
+  vars:
+    target_file_path: '{{ target_profile_script }}'
+    regexp_checker: '^export OS_PROJECT_NAME='
+    content_to_be_appended: 'export OS_PROJECT_NAME=admin'
+
+- name: Add OS_USER_DOMAIN_NAME to Env variable
+  import_role:
+    name: "{{ role_path }}/../insert_line_if_line_not_exists"
+  vars:
+    target_file_path: '{{ target_profile_script }}'
+    regexp_checker: '^export OS_USER_DOMAIN_NAME='
+    content_to_be_appended: 'export OS_USER_DOMAIN_NAME=Default'
+
+- name: Add OS_PROJECT_DOMAIN_NAME to Env variable
+  import_role:
+    name: "{{ role_path }}/../insert_line_if_line_not_exists"
+  vars:
+    target_file_path: '{{ target_profile_script }}'
+    regexp_checker: '^export OS_PROJECT_DOMAIN_NAME='
+    content_to_be_appended: 'export OS_PROJECT_DOMAIN_NAME=Default'
+
+- name: Add OS_AUTH_URL to Env variable
+  import_role:
+    name: "{{ role_path }}/../insert_line_if_line_not_exists"
+  vars:
+    target_file_path: '{{ target_profile_script }}'
+    regexp_checker: '^export OS_AUTH_URL='
+    content_to_be_appended: 'export OS_AUTH_URL={{ keystone_url }}'
+
+- name: Add OS_IDENTITY_API_VERSION to Env variable
+  import_role:
+    name: "{{ role_path }}/../insert_line_if_line_not_exists"
+  vars:
+    target_file_path: '{{ target_profile_script }}'
+    regexp_checker: '^export OS_IDENTITY_API_VERSION='
+    content_to_be_appended: 'export OS_IDENTITY_API_VERSION=3'
+
+

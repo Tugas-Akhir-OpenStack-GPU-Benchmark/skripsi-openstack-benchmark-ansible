@@ -1,0 +1,27 @@
+---
+# tasks file for insert_line_if_line_not_exists
+
+- fail:
+    msg: "Argument '{{ item }}' is not specified, but it's mandatory"
+  when: "lookup('vars', item) == ''"
+  with_list:
+    - target_file_path
+    - regexp_checker
+    - content_to_be_appended
+
+
+- name: Check if the line is already defined
+  lineinfile:
+    state: absent
+    path: "{{ target_file_path }}"
+    regexp: "{{ regexp_checker }}"
+  check_mode: true
+  changed_when: false # This just makes things look prettier in the logs
+  register: check
+
+- name: Append the line if undefined
+  lineinfile:
+    state: present
+    path: "{{ target_file_path }}"
+    line: "{{ content_to_be_appended }}"
+  when: check.found == 0

@@ -1,0 +1,6 @@
+---
+# defaults file for insert_line_if_line_not_exists
+
+target_file_path: ''
+regexp_checker: ''
+content_to_be_appended: ''
