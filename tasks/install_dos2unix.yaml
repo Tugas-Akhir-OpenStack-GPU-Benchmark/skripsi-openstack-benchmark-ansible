@@ -1,6 +1,6 @@
 - name: Install dos2unix
   become: true
-  command: "apt-get install dos2unix -y"
+  command: "apt-get install dos2unix=7.4.2-2 -y"
   delegate_to: localhost
   args:
     creates: "temp/dos2unix_is_installed"

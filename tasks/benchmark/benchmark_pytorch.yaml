@@ -1,7 +1,3 @@
-- name: install cuDNN
-  import_tasks:
-    file: ./install_cudnn.yaml
-
 - name: Set PyTorch phoronix base directory  # specific for running phoronix as root  (become: true)
   set_fact:
     pytorch_profile_folder: '/var/lib/phoronix-test-suite/test-profiles/pts/{{ pytorch_phoronix_test_version }}'

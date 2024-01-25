@@ -20,8 +20,12 @@
 
 - name: "Install libapache2-mod-wsgi-py3"
   command: "apt-get install libapache2-mod-wsgi-py3 -y"
+
+  # Deprecated version, depends on python 2?
+  # Not available in newer distros (tested on WSL)
 - name: "Install libapache2-mod-wsgi"
   command: "apt-get install libapache2-mod-wsgi -y"
+
 - name: "Install apache2"
   command: "apt-get install apache2 -y"
 - name: "Install keystone"
