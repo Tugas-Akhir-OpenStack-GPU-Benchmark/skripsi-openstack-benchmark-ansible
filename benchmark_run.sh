@@ -19,6 +19,6 @@ sudo env ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook "$MAIN_SCRIPT" -i "$IN
 
 
 
-export ANSIBLE_EXTRAVARS = "ansible_host=$1 ansible_user=immanuel01 ansible_ssh_private_key_file=~/.ssh/gcp"
+export ANSIBLE_EXTRAVARS="ansible_host=$1 ansible_user=immanuel01 ansible_ssh_private_key_file=~/.ssh/gcp"
 #sudo ansible-playbook ./tasks/benchmark/main.yaml -i ./tasks/benchmark/inventory.txt -e "$ANSIBLE_EXTRAVARS"
 #sudo ansible-playbook ./tasks/benchmark/main.yaml -i ./tasks/benchmark/inventory.txt -e "$ANSIBLE_EXTRAVARS" --start-at-task="chmod prime-run"

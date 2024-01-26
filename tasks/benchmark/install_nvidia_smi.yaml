@@ -28,6 +28,11 @@
       - xorg
       - openbox
 
+- name: register status of ~/nvidia_driver_is_installed
+  stat:
+    path: "{{ base_path }}/nvidia_driver_is_installed"
+  register: nvidia_driver_is_installed
+
 
 - name: "Run nvidia.nvidia_driver Role"
   import_role:
@@ -36,7 +41,12 @@
     nvidia_driver_skip_reboot: no
 #    nvidia_driver_package_version: "525.147.05"
     nvidia_driver_persistence_mode_on: yes
+  when: "not nvidia_driver_is_installed.stat.exists"
 
+
+- name: Mark PHP as installed
+  command: "touch \"{{ base_path }}/nvidia_driver_is_installed\""
+  when: "not nvidia_driver_is_installed.stat.exists"
 
 
 # instead of installing in /usr/local/cuda, it will install in various folder (see dpkg -L nvidia-cuda-toolkit | grep include)
