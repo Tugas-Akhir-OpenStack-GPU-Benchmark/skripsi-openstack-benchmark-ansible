@@ -17,12 +17,34 @@
   async: true
   poll: 0
 
-- name: run glmark2 benchmarking
-  command: "{{ prime_run }} env DISPLAY=:1 glmark2 2>&1"
+- name: run glmark2 benchmarking 1920x1080
+  command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 1920x1080 2>&1"
   become: true
   args:
     chdir: "{{ phoronix_folder }}"
   register: glmark2_benchmark_result
+
+- name: run glmark2 benchmarking 1440x810
+  command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 1440x810 2>&1"
+  become: true
+  args:
+    chdir: "{{ phoronix_folder }}"
+  register: glmark2_benchmark_result
+
+- name: run glmark2 benchmarking 960x540
+  command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 960x540 2>&1"
+  become: true
+  args:
+    chdir: "{{ phoronix_folder }}"
+  register: glmark2_benchmark_result
+
+- name: run glmark2 benchmarking 192x108
+  command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 192x108 2>&1"
+  become: true
+  args:
+    chdir: "{{ phoronix_folder }}"
+  register: glmark2_benchmark_result
+
 
 
 
