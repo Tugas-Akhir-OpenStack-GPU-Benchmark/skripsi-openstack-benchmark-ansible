@@ -8,8 +8,3 @@
     update_cache: yes
     name: dos2unix=7.4.0-2
     state: present
-
-- name: Create marker file if dos2unix is installed
-  file:
-    path: temp/dos2unix_is_installed
-    state: touch

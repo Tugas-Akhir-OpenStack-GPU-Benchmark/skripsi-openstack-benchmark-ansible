@@ -17,3 +17,4 @@ gcloud compute instances create gpu-korea \
     --shielded-integrity-monitoring \
     --labels=goog-ec-src=vm_add-gcloud \
     --reservation-affinity=any
+
