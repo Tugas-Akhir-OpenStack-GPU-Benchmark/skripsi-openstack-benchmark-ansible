@@ -6,9 +6,8 @@
   become: true
   apt:
     update_cache: yes
-    name: dos2unix
+    name: dos2unix=7.4.2-2
     state: present
-    version: 7.4.2-2
 
 - name: Create marker file if dos2unix is installed
   file:
