@@ -1,15 +1,16 @@
-- name: Install dos2unix
-  become: true
-  command: "apt-get install dos2unix=7.4.2-2 -y"
-  delegate_to: localhost
-  args:
-    creates: "temp/dos2unix_is_installed"
 - name: ensure temp folder exists
   command: "mkdir -p temp"
   delegate_to: localhost
-- name: Mark dos2unix installed
+
+- name: Install dos2unix
   become: true
-  command: "touch \"temp/dos2unix_is_installed\""
-  delegate_to: localhost
-  args:
-    creates: "temp/dos2unix_is_installed"
+  apt:
+    update_cache: yes
+    name: dos2unix
+    state: present
+    version: 7.4.2-2
+
+- name: Create marker file if dos2unix is installed
+  file:
+    path: temp/dos2unix_is_installed
+    state: touch
