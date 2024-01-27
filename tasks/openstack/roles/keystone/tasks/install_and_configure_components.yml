@@ -54,8 +54,15 @@
     local_script_name: 'configure_keystone_conf.py'
     arguments: "\"{{ keystone_db_password }}\""
 
+#- name: "create keystone user"
+#  ansible.builtin.user:
+#    name: keystone
+#    comment: OpenStack Keystone
+#    group: admin
+
 - name: Populate the Identity service database
-  command: "su -s /bin/sh -c \"keystone-manage db_sync\" keystone"
+  command: "keystone-manage db_sync"
+#  command: "su -s /bin/sh -c \"keystone-manage db_sync\" keystone"
 
 - name: Initialize Fernet key repositories (fernet_setup)
   command: "keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone"

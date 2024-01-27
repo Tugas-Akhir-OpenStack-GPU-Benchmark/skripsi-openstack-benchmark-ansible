@@ -17,41 +17,75 @@
   async: true
   poll: 0
 
-- name: run glmark2 benchmarking
-  command: "{{ prime_run }} env DISPLAY=:1 glmark2 2>&1"
+
+
+- name: run glmark2 benchmarking 1920x1080
+  command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 1920x1080 2>&1"
   become: true
   args:
     chdir: "{{ phoronix_folder }}"
   register: glmark2_benchmark_result
 
+- set_fact:
+    cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+
+- name: write glmark2 benchmark stdout logs 1920x1080
+  delegate_to: localhost
+  copy:
+    content: "{{ cleaned_glmark2_benchmark_result }}"
+    dest: temp/glmark2_benchmark_result_1920x1080.txt
 
 
-#- name: install phoronix glmark2
-#  command: "env DISPLAY=:1 ./phoronix-test-suite install {{ glmark2_version }} 2>&1"
-#  become: true
-#  args:
-#    chdir: "{{ phoronix_folder }}"
-#
-#
-#- name: run glmark2 benchmark
-#  async: 10000
-#  poll: 5
-#  become: true
-#  expect:
-#    timeout: 670
-#    command: "{{ prime_run }} env DISPLAY=:1 {{ phoronix_test_suite }} benchmark glmark2 2>&1"
-#    responses:
-#      'Resolution:': 4  # 1280 x 960
-#      'Would you like to save these test results': 'n'
-#  register: glmark2_benchmark_result
 
+- name: run glmark2 benchmarking 1440x810
+  command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 1440x810 2>&1"
+  become: true
+  args:
+    chdir: "{{ phoronix_folder }}"
+  register: glmark2_benchmark_result
 
 - set_fact:
     cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
 
-
-- name: write glmark2 benchmark stdout logs
+- name: write glmark2 benchmark stdout logs 1440x810
   delegate_to: localhost
   copy:
     content: "{{ cleaned_glmark2_benchmark_result }}"
-    dest: temp/glmark2_benchmark_result.txt
+    dest: temp/glmark2_benchmark_result_1440x810.txt
+
+
+
+- name: run glmark2 benchmarking 960x540
+  command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 960x540 2>&1"
+  become: true
+  args:
+    chdir: "{{ phoronix_folder }}"
+  register: glmark2_benchmark_result
+
+- set_fact:
+    cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+
+- name: write glmark2 benchmark stdout logs 960x540
+  delegate_to: localhost
+  copy:
+    content: "{{ cleaned_glmark2_benchmark_result }}"
+    dest: temp/glmark2_benchmark_result_960x540.txt
+
+
+
+- name: run glmark2 benchmarking 192x108
+  command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 192x108 2>&1"
+  become: true
+  args:
+    chdir: "{{ phoronix_folder }}"
+  register: glmark2_benchmark_result
+
+- set_fact:
+    cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+
+- name: write glmark2 benchmark stdout logs 192x108
+  delegate_to: localhost
+  copy:
+    content: "{{ cleaned_glmark2_benchmark_result }}"
+    dest: temp/glmark2_benchmark_result_192x108.txt
+

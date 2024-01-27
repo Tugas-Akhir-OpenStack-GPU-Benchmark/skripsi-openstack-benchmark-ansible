@@ -1,3 +1,6 @@
+- name: Set namd phoronix base directory  # specific for running phoronix as root  (become: true)
+  set_fact:
+    namd_test_folder: '/var/lib/phoronix-test-suite/installed-tests/pts/{{ namd_version }}'
 
 
 - name: install phoronix namd-cuda
@@ -5,11 +8,24 @@
   become: true
   args:
     chdir: "{{ phoronix_folder }}"
+  register: namd_cuda_install_result
+- set_fact:
+    cleaned_namd_cuda_install_result: "{{ namd_cuda_install_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+- name: write namd-cuda install logs
+  delegate_to: localhost
+  copy:
+    content: "{{ cleaned_namd_cuda_install_result }}"
+    dest: temp/namd_cuda_install_result.txt
 
-- name: Set namd phoronix base directory  # specific for running phoronix as root  (become: true)
-  set_fact:
-    namd_test_folder: '/var/lib/phoronix-test-suite/installed-tests/pts/{{ namd_version }}'
 
+- name: Check that NAMD f1atpase.zip downloaded successfully
+  stat:
+    path: "{{ namd_test_folder }}/f1atpase.zip"
+  register: NAMD_f1atpase_exists
+
+- assert:
+    that:
+      - "NAMD_f1atpase_exists.stat.exists"
 
 # Two tasks below need to be done manually because somehow the Phoronix's NAMD installation through ansible
 # is not working properly, although it works if we do SSH manually and *initiate* the phoronix NAMD installation manually
@@ -20,11 +36,19 @@
     path: "{{ namd_test_folder }}/f1atpase"
     state: directory
 
+
+
+- name: Check if NAMD f1atpase.zip need to be unzipped manually
+  stat:
+    path: "{{ namd_test_folder }}/f1atpase/f1atpase.namd"
+  register: f1atpase_extracted_folder
+
 - name: Extract NAMD testcase f1atpase.zip  #
   unarchive:
     src: "{{ namd_test_folder }}/f1atpase.zip"
     dest: "{{ namd_test_folder }}"
     remote_src: yes
+  when: "not f1atpase_extracted_folder.stat.exists"
 
 - name: run namd benchmark
   async: 10000
