@@ -8,7 +8,7 @@ threshold=0.05
 printf "Hello, starting up at $(date) \n" >> log.txt
 
 count=0
-wait_minutes=20
+wait_minutes=45
 while true
 do
 

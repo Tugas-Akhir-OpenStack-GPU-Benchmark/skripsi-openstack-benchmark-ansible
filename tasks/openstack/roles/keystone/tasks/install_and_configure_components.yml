@@ -52,7 +52,7 @@
     # which may cause bug (file not found)
     local_dir: "{{ files_path__keystone_module }}"
     local_script_name: 'configure_keystone_conf.py'
-    arguments: "\"{{ keystone_db_password }}\""
+    arguments: "\"{{ keystone_db_password }}\" \"{{ keystone_host }}\""
 
 #- name: "create keystone user"
 #  ansible.builtin.user:
@@ -63,18 +63,36 @@
 - name: Populate the Identity service database
   command: "keystone-manage db_sync"
 #  command: "su -s /bin/sh -c \"keystone-manage db_sync\" keystone"
+  register: keystone_manage_db_sync
+  failed_when: keystone_manage_db_sync.rc != 1 and keystone_manage_db_sync.rc != 0
+
 
 - name: Initialize Fernet key repositories (fernet_setup)
-  command: "keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone"
+  command: "keystone-manage fernet_setup --keystone-user {{ keystone_linux_user }} --keystone-group keystone"
 
 - name: Initialize Fernet key repositories (credential_setup)
-  command: "keystone-manage credential_setup --keystone-user keystone --keystone-group keystone"
+  command: "keystone-manage credential_setup --keystone-user {{ keystone_linux_user }} --keystone-group keystone"
+
+- name: debug1
+  debug:
+    msg: "{{ ansible_default_ipv4.address }}"
+
+- set_fact:
+    cmd: "keystone-manage bootstrap --bootstrap-password {{ keystone_admin_password }} --bootstrap-admin-url {{ keystone_url }} --bootstrap-internal-url {{ keystone_url }} --bootstrap-public-url {{ keystone_url }} --bootstrap-region-id RegionOne"
+
+- debug:
+    msg: "{{ cmd }}"
 
 - name: Bootstrap the Identity service
-  command: "keystone-manage bootstrap --bootstrap-password {{ keystone_admin_password }} --bootstrap-admin-url {{ keystone_url }} --bootstrap-internal-url {{ keystone_url }} --bootstrap-public-url {{ keystone_url }} --bootstrap-region-id RegionOne"
+  command: "{{ cmd }}"
+  register: Bootstrap_the_Identity_service
+  failed_when: Bootstrap_the_Identity_service.rc != 1 and Bootstrap_the_Identity_service.rc != 0
 
-
-
+#  changed_when: false
+#  register: add_service
+#  until: add_service is success
+#  retries: 5
+#  delay: 10
 
 - name: Check if  is already defined
   lineinfile:
@@ -105,8 +123,8 @@
 
 
 - set_fact:
-    target_profile_script: "/root/.profile"
-
+#    target_profile_script: "/root/.profile"
+    target_profile_script: "/home/{{ keystone_linux_user }}/.profile"
 
 - name: Add OS_USERNAME to Env variable
   import_role:
@@ -122,7 +140,7 @@
   vars:
     target_file_path: '{{ target_profile_script }}'
     regexp_checker: '^export OS_PASSWORD='
-    content_to_be_appended: 'export OS_PASSWORD=\"{{ keystone_admin_password }}\"'
+    content_to_be_appended: 'export OS_PASSWORD="{{ keystone_admin_password }}"'
 
 - name: Add OS_PROJECT_NAME to Env variable
   import_role:
