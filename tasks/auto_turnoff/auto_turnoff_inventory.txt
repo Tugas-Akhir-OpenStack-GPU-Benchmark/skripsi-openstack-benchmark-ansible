@@ -1,0 +1,7 @@
+[target]
+target1
+
+[target:vars]
+ansible_connection=ssh
+ansible_user=immanuel01
+ansible_ssh_private_key_file=~/.ssh/gcp
