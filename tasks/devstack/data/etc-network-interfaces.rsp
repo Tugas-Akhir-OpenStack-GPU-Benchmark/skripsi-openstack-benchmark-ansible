@@ -1,0 +1,5 @@
+auto {{ interface_1 }}
+iface {{ interface_1 }} inet static
+    address 192.168.42.11
+    netmask 255.255.255.0
+    gateway 192.168.42.1

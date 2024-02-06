@@ -1,0 +1,97 @@
+# asia-northeast3-c
+- name: Main
+  hosts: all
+  become: True
+  vars:
+    base_path: /home/root
+  tasks:
+    - name: ensure base_path is exists
+      command: "mkdir -p {{ base_path }}"
+    - name: "install git, ifconfig, pip3"
+      apt:
+        update_cache: yes
+        name:
+          - git
+          - net-tools
+          - python3-pip
+    # Get information about NIC
+    - name: "pip3 install psutil 5.9.8"
+      command: "pip3 install psutil==5.9.8"
+    - name: "pip3 install netifaces 0.11.0"
+      command: "pip3 install netifaces==0.11.0"
+    - name: "get information about NIC & ip_address"
+      script: "./data/get_network_information.py"
+      # script: "./data/get_network_information.py  {{ interface_1 }} {{ interface_2 }}"
+      register: nic_information_json
+    - set_fact:
+        nic_information_json: "{{ nic_information_json.stdout }}"
+    - set_fact:
+        interface_1: "{{ nic_information_json['interface_1'] }}"
+        interface_2: "{{ nic_information_json['interface_2'] }}"
+    - debug:
+        msg: "{{ nic_information_json }}"
+    - set_fact:
+        ip_address_1: "{{ nic_information_json['nic'][interface_1]['ipaddr'] }}"
+        ip_address_2: "{{ nic_information_json['nic'][interface_2]['ipaddr'] }}"
+        netmask_1: "{{ nic_information_json['nic'][interface_1]['netmask'] }}"
+        netmask_2: "{{ nic_information_json['nic'][interface_2]['netmask'] }}"
+        gateway: "{{ nic_information_json['gateway']['ipaddr'] }}"
+    - debug:
+        msg: "{{ ip_address_1 }} {{ ip_address_2 }}"
+
+
+    - name: "check if `stack` user already exists"
+      command: "id -u stack"
+      register: "check_user_exists"
+      failed_when: false
+    - name: "create `stack` user if not exists"
+      command: "useradd -s /bin/bash -d /opt/stack -m stack"
+      when: "check_user_exists.rc != 0"
+    - name: "Set /opt/stack permission as executable"
+      become: yes
+      file:
+        path: /opt/stack
+        mode: +x
+#    - community.general.sudoers:
+#        name: stack
+#        nopassword: true
+#        commands: "ALL"
+    - name: Ensure stack is a sudoers
+      become: yes
+      lineinfile:
+        path: /etc/sudoers
+        line: "stack ALL=(ALL) NOPASSWD: ALL"
+        create: yes
+        validate: 'visudo -cf %s'
+    - remote_user: stack
+      become_user: stack
+      become_method: sudo
+      block:
+        - name: "check current username"
+          command: "whoami"
+          register: whoami
+        - debug:
+            msg: "user: {{ whoami.stdout }}"
+        - fail:
+            msg: "Failed to authorized as `stack`"
+          when: "{{ whoami.stdout != 'stack' }}"
+        - name: Ensure .ssh folder exists
+          file:
+            path: ~/.ssh
+            state: directory
+            mode: "0700"
+        - copy:
+            src: "./data/gcp"
+            dest: "~/.ssh/gcp"
+            mode: "0700"
+        - copy:
+            src: "./data/gcp.pub"
+            dest: "~/.ssh/gcp.pub"
+            mode: "0700"
+        - name: Ensure devstack folder exists
+          file:
+            path: ~/devstack
+            state: directory
+            mode: "0777"
+        - name: "git clone devstack"
+          command: "git clone https://opendev.org/openstack/devstack ~/devstack --depth=1"
