@@ -8,7 +8,7 @@ threshold=0.05
 printf "Hello, starting up at $(date) \n" >> log.txt
 
 count=0
-wait_minutes=45
+wait_minutes=60
 while true
 do
 
@@ -19,7 +19,7 @@ do
   then
     ((count+=1))
   else
-    ((count-=3))
+    ((count-=5))
   fi
 
   if [ "$count" -lt "0" ]

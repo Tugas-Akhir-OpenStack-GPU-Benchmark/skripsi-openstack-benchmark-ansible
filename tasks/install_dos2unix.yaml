@@ -6,5 +6,5 @@
   become: true
   apt:
     update_cache: yes
-    name: dos2unix=7.4.0-2
+    name: dos2unix
     state: present
