@@ -5,7 +5,7 @@
   vars:
     base_path: /home/root
   tasks:
-    - name: ensure base_path is exists
+    - name: ensure base_path exists
       command: "mkdir -p {{ base_path }}"
     - name: "install git, ifconfig, pip3"
       apt:
@@ -36,6 +36,9 @@
         netmask_1: "{{ nic_information_json['nic'][interface_1]['netmask'] }}"
         netmask_2: "{{ nic_information_json['nic'][interface_2]['netmask'] }}"
         gateway: "{{ nic_information_json['gateway']['ipaddr'] }}"
+    - set_fact:
+        # controller-node defined in inventory.txt
+        controller_ip_addr: "{{ hostvars['controller-node']['ip_address_1'] }}"
     - debug:
         msg: "{{ ip_address_1 }} {{ ip_address_2 }}"
 
@@ -74,17 +77,19 @@
             msg: "user: {{ whoami.stdout }}"
         - fail:
             msg: "Failed to authorized as `stack`"
-          when: "{{ whoami.stdout != 'stack' }}"
+          when: "whoami.stdout != 'stack'"
         - name: Ensure .ssh folder exists
           file:
             path: ~/.ssh
             state: directory
             mode: "0700"
-        - copy:
+        - name: Transfer private key
+          copy:
             src: "./data/gcp"
             dest: "~/.ssh/gcp"
             mode: "0700"
-        - copy:
+        - name: Transfer public key
+          copy:
             src: "./data/gcp.pub"
             dest: "~/.ssh/gcp.pub"
             mode: "0700"
@@ -93,5 +98,74 @@
             path: ~/devstack
             state: directory
             mode: "0777"
+        - name: Check if devstack folder not yet cloned
+          shell:
+            cmd: "git branch"
+            chdir: ~/devstack
+          register: devstack_already_cloned
+          failed_when: false
         - name: "git clone devstack"
           command: "git clone https://opendev.org/openstack/devstack ~/devstack --depth=1"
+          when: "devstack_already_cloned.rc != 0"
+        - set_fact:
+            node_type: >-
+              {%- if inventory_hostname in groups['compute'] -%}
+              compute
+              {%- elif inventory_hostname in groups['controller'] -%}
+              controller
+              {%- else -%}
+              error
+              {%- endif -%}
+            is_compute: "{{ inventory_hostname in groups['compute'] }}"
+            is_controller: "{{ inventory_hostname in groups['controller'] }}"
+        - debug:
+            msg: >-
+              is_compute: {{ is_compute }}
+              is_controller: {{ is_controller }}
+              node_type: {{ node_type }}
+              inventory_hostname: {{ inventory_hostname }}
+        - fail:
+            msg: "current node is registered inside an invalid inventory group"
+          when: "node_type == 'error'"
+        - name: copy local.conf to server
+          template:
+            src: "./data/{{ node_type }}-local.conf"
+            dest: ~/devstack/local.conf
+        - when: is_controller
+          block:
+            - name: copy local.sh to server
+              template:
+                src: "./data/{{ node_type }}-local.sh"
+                dest: ~/devstack/local.sh
+            - name: "Set local.sh permission as executable"
+              file:
+                path: ~/devstack/local.sh
+                mode: "0777"
+        - name: "Set stack.sh permission as executable"
+          file:
+            path: ~/devstack/stack.sh
+            mode: "0777"
+        - name: running stack.sh for controller node
+          shell:
+            cmd:  "nohup ~/devstack/stack.sh 2>&1 > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
+            chdir: ~/devstack
+            creates: "~/devstack/nohup.out"
+          when: is_controller
+        - name: running stack.sh for compute node
+          shell:
+            cmd:  "nohup ~/devstack/stack.sh 2>&1 > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
+            chdir: ~/devstack
+            creates: "~/devstack/nohup.out"
+          when: is_compute
+        - name: copy stack.sh log
+          fetch:
+            src: "~/devstack/nohup.out"
+            dest: "./temp/stack-nohup-output-{{ node_type }}.txt"
+            fail_on_missing: yes
+            flat: yes
+        - name: copy stack.sh log
+          fetch:
+            src: "/opt/stack/logs/stack.sh.log"
+            dest: "./temp/devstack-log-{{ node_type }}.txt"
+            fail_on_missing: yes
+            flat: yes

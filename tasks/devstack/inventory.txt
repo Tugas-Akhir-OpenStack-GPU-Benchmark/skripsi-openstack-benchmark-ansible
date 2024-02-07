@@ -1,5 +1,5 @@
 [controller]
-controller-node-1 ansible_host=34.64.243.87
+controller-node ansible_host=34.47.75.51
 
-[gpu]
-compute-node-1 ansible_host=34.64.205.150
+[compute]
+compute-node-1 ansible_host=34.47.76.42
