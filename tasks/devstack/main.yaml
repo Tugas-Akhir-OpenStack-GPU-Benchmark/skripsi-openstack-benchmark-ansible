@@ -112,6 +112,12 @@
         - name: "git clone devstack"
           command: "git clone https://opendev.org/openstack/devstack ~/devstack --depth=1"
           when: "devstack_already_cloned.rc != 0"
+        - name: replace GIT_DEPTH=0 to GIT_DEPTH=1 inside stack.sh to increase performance
+          replace:
+            path: ~/devstack/stack.sh
+            regexp: 'GIT_DEPTH=0 git_clone'
+            replace: 'GIT_DEPTH=1 git_clone'
+            backup: yes
         - set_fact:
             node_type: >-
               {%- if inventory_hostname in groups['compute'] -%}
@@ -154,13 +160,13 @@
           shell:
             cmd:  "nohup ~/devstack/stack.sh 2>&1 > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
             chdir: ~/devstack
-            creates: "~/devstack/nohup.out"
+#            creates: "~/devstack/nohup.out"
           when: is_controller
         - name: running stack.sh for compute node
           shell:
             cmd:  "nohup ~/devstack/stack.sh 2>&1 > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
             chdir: ~/devstack
-            creates: "~/devstack/nohup.out"
+#            creates: "~/devstack/nohup.out"
           when: is_compute
         - name: copy stack.sh log
           fetch:
