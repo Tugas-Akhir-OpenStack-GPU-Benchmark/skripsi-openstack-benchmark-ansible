@@ -1,0 +1,22 @@
+- name: "check if `stack` user already exists"
+  command: "id -u stack"
+  register: "check_user_exists"
+  failed_when: false
+- name: "create `stack` user if not exists"
+  command: "useradd -G systemd-journal -s /bin/bash -d /opt/stack -m stack"
+  when: "check_user_exists.rc != 0"
+- name: "allow logging in to stack without password"
+  command: "passwd -d stack"
+  become: true
+- name: "Set /opt/stack permission as executable"
+  become: yes
+  file:
+    path: /opt/stack
+    mode: 0777
+- name: Ensure stack is a sudoers
+  become: yes
+  lineinfile:
+    path: /etc/sudoers
+    line: "stack ALL=(ALL) NOPASSWD: ALL"
+    create: yes
+    validate: 'visudo -cf %s'

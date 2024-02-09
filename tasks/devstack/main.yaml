@@ -3,213 +3,38 @@
   hosts: all
   become: True
   vars:
-    base_path: /home/root
+    base_path: /opt/stack
+    admin_password: "1122"
   tasks:
-    - name: ensure base_path exists
-      command: "mkdir -p {{ base_path }}"
-    - name: "install git, ifconfig, pip3"
-      apt:
-        update_cache: yes
-        name:
-          - git
-          - net-tools
-          - python3-pip
-    # Get information about NIC
-    - name: "pip3 install psutil 5.9.8"
-      command: "pip3 install psutil==5.9.8"
-    - name: "pip3 install netifaces 0.11.0"
-      command: "pip3 install netifaces==0.11.0"
-    - name: "get information about NIC & ip_address"
-      script: "./data/get_network_information.py"
-      # script: "./data/get_network_information.py  {{ interface_1 }} {{ interface_2 }}"
-      register: nic_information_json
-    - set_fact:
-        nic_information_json: "{{ nic_information_json.stdout }}"
-    - set_fact:
-        interface_1: "{{ nic_information_json['interface_1'] }}"
-        interface_2: "{{ nic_information_json['interface_2'] }}"
+    - import_tasks: ./tasks/check-if-devstack-successfully-installed.yml
     - debug:
-        msg: "{{ nic_information_json }}"
-    - set_fact:
-        ip_address_1: "{{ nic_information_json['nic'][interface_1]['ipaddr'] }}"
-        ip_address_2: "{{ nic_information_json['nic'][interface_2]['ipaddr'] }}"
-        netmask_1: "{{ nic_information_json['nic'][interface_1]['netmask'] }}"
-        netmask_2: "{{ nic_information_json['nic'][interface_2]['netmask'] }}"
-        gateway: "{{ nic_information_json['gateway']['ipaddr'] }}"
-    - set_fact:
-        # controller-node defined in inventory.txt
-        controller_ip_addr: "{{ hostvars['controller-node']['ip_address_1'] }}"
-    - debug:
-        msg: "{{ ip_address_1 }} {{ ip_address_2 }}"
+        var: devstack_already_installed_successfully
+    - import_tasks: ./tasks/get-ip-addr-information.yml
+    - when: "not devstack_already_installed_successfully"
+      block:  # this block is idempotent. This is done just to increase performance
+        - import_tasks: ./tasks/create-user-for-openstack.yml
 
+        - name: "allow to run ansible become_user: stack"  # see https://stackoverflow.com/a/56379678/7069108
+          apt:
+            update_cache: yes
+            name:
+              - acl
 
-    - name: "check if `stack` user already exists"
-      command: "id -u stack"
-      register: "check_user_exists"
-      failed_when: false
-    - name: "create `stack` user if not exists"
-      command: "useradd -G systemd-journal -s /bin/bash -d /opt/stack -m stack"
-      when: "check_user_exists.rc != 0"
-    - name: "allow logging in to stack without password"
-      command: "passwd -d stack"
-      become: true
-    - name: "Set /opt/stack permission as executable"
-      become: yes
-      file:
-        path: /opt/stack
-#        mode: +x
-        mode: 0777
-#    - community.general.sudoers:
-#        name: stack
-#        nopassword: true
-#        commands: "ALL"
-    - name: Ensure stack is a sudoers
-      become: yes
-      lineinfile:
-        path: /etc/sudoers
-        line: "stack ALL=(ALL) NOPASSWD: ALL"
-        create: yes
-        validate: 'visudo -cf %s'
-    - name: "allow to run ansible become_user: stack"  # see https://stackoverflow.com/a/56379678/7069108
-      apt:
-        update_cache: yes
-        name:
-          - acl
     - remote_user: stack
       become_user: stack
       become_method: sudo
       block:
-        - name: "check current username"
-          command: "whoami"
-          register: whoami
-        - debug:
-            msg: "user: {{ whoami.stdout }}"
-        - fail:
-            msg: "Failed to authorized as `stack`"
-          when: "whoami.stdout != 'stack'"
-        - name: Upload logging-viewer script
-          copy:
-            src: "./data/view-log.py"
-            dest: "~/view-log.py"
-            mode: "0777"
-        - name: ssh-related
+        - import_tasks: ./tasks/assert-logged-in-to-the-correct-user.yml
+
+        - when: "not devstack_already_installed_successfully"
           block:
-            - name: Ensure .ssh folder exists
-              file:
-                path: ~/.ssh
-                state: directory
-                mode: "0700"
-            - name: Transfer private key
-              copy:
-                src: "./data/gcp"
-                dest: "~/.ssh/gcp"
-                mode: "0700"
-            - name: Transfer public key
-              copy:
-                src: "./data/gcp.pub"
-                dest: "~/.ssh/gcp.pub"
-                mode: "0700"
-        - name: Ensure devstack folder exists
-          file:
-            path: ~/devstack
-            state: directory
-            mode: "0777"
-        - name: Check if devstack folder not yet cloned
-          shell:
-            cmd: "git branch"
-            chdir: ~/devstack
-          register: devstack_already_cloned
-          failed_when: false
-        - name: "git clone devstack"
-          command: "git clone https://opendev.org/openstack/devstack ~/devstack --depth=1"
-          when: "devstack_already_cloned.rc != 0"
-        - name: replace GIT_DEPTH=0 to GIT_DEPTH=1 inside stack.sh to increase performance
-          replace:
-            path: ~/devstack/stack.sh
-            regexp: 'GIT_DEPTH=0 git_clone'
-            replace: 'GIT_DEPTH=1 git_clone'
-            backup: yes
-        - name: add GIT_DEPTH=1 inside functions-common to increase performance
-          replace:
-            path: ~/devstack/functions-common
-            regexp: 'local orig_dir\n'  # need to specify trailing new line to ensure idempotent
-            replace: "local orig_dir #\nlocal GIT_DEPTH=1\n"
-            backup: yes
-        - set_fact:
-            node_type: >-
-              {%- if inventory_hostname in groups['compute'] -%}
-              compute
-              {%- elif inventory_hostname in groups['controller'] -%}
-              controller
-              {%- else -%}
-              error
-              {%- endif -%}
-            is_compute: "{{ inventory_hostname in groups['compute'] }}"
-            is_controller: "{{ inventory_hostname in groups['controller'] }}"
-        - debug:
-            msg: >-
-              is_compute: {{ is_compute }}
-              is_controller: {{ is_controller }}
-              node_type: {{ node_type }}
-              inventory_hostname: {{ inventory_hostname }}
-        - fail:
-            msg: "current node is registered inside an invalid inventory group"
-          when: "node_type == 'error'"
-        - name: copy local.conf to server
-          template:
-            src: "./data/{{ node_type }}-local.conf"
-            dest: ~/devstack/local.conf
-        - when: is_controller
-          block:
-            - name: copy local.sh to server
-              template:
-                src: "./data/{{ node_type }}-local.sh"
-                dest: ~/devstack/local.sh
-            - name: "Set local.sh permission as executable"
-              file:
-                path: ~/devstack/local.sh
-                mode: "0777"
-        - name: "Uninstall devstack-openstack"  # because devstack stack.sh is not idempotent
-          block:
-            - name: "Set clean.sh permission as executable"
-              file:
-                path: ~/devstack/clean.sh
-                mode: "0777"
-            - name: running clean.sh
-              shell:
-                cmd:  "~/devstack/clean.sh 2>&1 > clean_sh_log.txt"
-                chdir: ~/devstack
-            - name: copy clean_sh_log.txt log
-              fetch:
-                src: "~/devstack/clean_sh_log.txt"
-                dest: "./temp/devstack-clean_sh-{{ node_type }}.txt"
-                fail_on_missing: yes
-                flat: yes
-        - name: "Set stack.sh permission as executable"
-          file:
-            path: ~/devstack/stack.sh
-            mode: "0777"
-        - name: running stack.sh for controller node  # need to setup controller first, then the compute node
-          shell:
-            cmd:  "nohup ~/devstack/stack.sh 2>&1 > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
-            chdir: ~/devstack
-#            creates: "~/devstack/nohup.out"
-          when: is_controller
-        - name: running stack.sh for compute node
-          shell:
-            cmd:  "nohup ~/devstack/stack.sh 2>&1 > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
-            chdir: ~/devstack
-#            creates: "~/devstack/nohup.out"
-          when: is_compute
-        - name: copy stack.sh log
-          fetch:
-            src: "~/devstack/nohup.out"
-            dest: "./temp/stack-nohup-output-{{ node_type }}.txt"
-            fail_on_missing: yes
-            flat: yes
-        - name: copy stack.sh log
-          fetch:
-            src: "/opt/stack/logs/stack.sh.log"
-            dest: "./temp/devstack-log-{{ node_type }}.txt"
-            fail_on_missing: yes
-            flat: yes
+            - import_tasks: ./tasks/prepare-installation-script.yml
+            - import_tasks: ./tasks/setup-devstack-configuration.yml
+            - import_tasks: ./tasks/uninstall-devstack.yml
+            - import_tasks: ./tasks/install-devstack.yml
+#    - become: true
+#      block:
+        - import_tasks: ./tasks/async-start-downloading-needed-linux-images.yml
+        - import_tasks: ./tasks/installation-finalization-step.yml
+        - import_tasks: ./tasks/insert-downloaded-linux-images-to-openstack.yml
+

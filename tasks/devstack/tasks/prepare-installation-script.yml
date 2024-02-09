@@ -1,0 +1,41 @@
+- name: Upload logging-viewer script
+  copy:
+    src: "../data/view-log.py"
+    dest: "~/view-log.py"
+    mode: "0777"
+- import_tasks: ./tasks/upload-ssh-key.yml
+- name: Ensure devstack folder exists
+  file:
+    path: ~/devstack
+    state: directory
+    mode: "0777"
+- name: Check if devstack folder not yet cloned
+  shell:
+    cmd: "git branch"
+    chdir: ~/devstack
+  register: devstack_already_cloned
+  failed_when: false
+- name: "git clone devstack"
+  command: "git clone https://opendev.org/openstack/devstack ~/devstack --depth=1"
+  when: "devstack_already_cloned.rc != 0"
+- name: replace GIT_DEPTH=0 to GIT_DEPTH=1 inside stack.sh to increase performance
+  replace:
+    path: ~/devstack/stack.sh
+    regexp: 'GIT_DEPTH=0 git_clone'
+    replace: 'GIT_DEPTH=1 git_clone'
+    backup: yes
+- name: add GIT_DEPTH=1 inside functions-common to increase performance
+  replace:
+    path: ~/devstack/functions-common
+    regexp: 'local orig_dir\n'  # need to specify trailing new line to ensure idempotent
+    replace: "local orig_dir #\nlocal GIT_DEPTH=1\n"
+    backup: yes
+- debug:
+    msg: >-
+      is_compute: {{ is_compute }}
+      is_controller: {{ is_controller }}
+      node_type: {{ node_type }}
+      inventory_hostname: {{ inventory_hostname }}
+- fail:
+    msg: "current node is registered inside an invalid inventory group"
+  when: "node_type == 'error'"

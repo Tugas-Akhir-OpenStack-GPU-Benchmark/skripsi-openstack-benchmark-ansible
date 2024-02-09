@@ -1,0 +1,15 @@
+- name: Ensure .ssh folder exists
+  file:
+    path: ~/.ssh
+    state: directory
+    mode: "0700"
+- name: Transfer private key
+  copy:
+    src: "../data/gcp"
+    dest: "~/.ssh/gcp"
+    mode: "0700"
+- name: Transfer public key
+  copy:
+    src: "../data/gcp.pub"
+    dest: "~/.ssh/gcp.pub"
+    mode: "0700"

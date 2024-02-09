@@ -1,0 +1,8 @@
+- name: "check current username"
+  command: "whoami"
+  register: whoami
+- debug:
+    msg: "user: {{ whoami.stdout }}"
+- fail:
+    msg: "Failed to authorized as `stack`"
+  when: "whoami.stdout != 'stack'"

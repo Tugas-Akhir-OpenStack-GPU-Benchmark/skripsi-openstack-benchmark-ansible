@@ -1,0 +1,26 @@
+- name: "Set stack.sh permission as executable"
+  file:
+    path: ~/devstack/stack.sh
+    mode: "0777"
+- name: running stack.sh for controller node  # need to setup controller first, then the compute node
+  shell:  # around 25 minutes
+    cmd:  "nohup ~/devstack/stack.sh 2>&1 > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
+    chdir: ~/devstack
+  when: is_controller
+- name: running stack.sh for compute node
+  shell:  # around 12 minutes
+    cmd:  "nohup ~/devstack/stack.sh 2>&1 > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
+    chdir: ~/devstack
+  when: is_compute
+- name: copy stack.sh log
+  fetch:
+    src: "~/devstack/nohup.out"
+    dest: "./temp/stack-nohup-output-{{ node_type }}.txt"
+    fail_on_missing: yes
+    flat: yes
+- name: copy stack.sh log
+  fetch:
+    src: "/opt/stack/logs/stack.sh.log"
+    dest: "./temp/devstack-log-{{ node_type }}.txt"
+    fail_on_missing: yes
+    flat: yes

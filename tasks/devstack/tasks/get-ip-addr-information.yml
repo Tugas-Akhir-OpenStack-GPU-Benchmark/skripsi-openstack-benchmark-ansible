@@ -1,0 +1,49 @@
+- name: ensure base_path exists
+  command: "mkdir -p {{ base_path }}"
+- name: "install git, ifconfig, pip3"
+  apt:
+    update_cache: yes
+    name:
+      - git
+      - net-tools
+      - python3-pip
+  when: "not devstack_already_installed_successfully"  # just to increase performance
+# Get information about NIC
+- name: "pip3 install psutil 5.9.8"
+  command: "pip3 install psutil==5.9.8"
+  when: "not devstack_already_installed_successfully"  # just to increase performance
+- name: "pip3 install netifaces 0.11.0"
+  command: "pip3 install netifaces==0.11.0"
+  when: "not devstack_already_installed_successfully"  # just to increase performance
+- name: "get information about NIC & ip_address"
+  script: "../data/get_network_information.py"
+  register: nic_information_json
+- set_fact:
+    nic_information_json: "{{ nic_information_json.stdout }}"
+- set_fact:
+    interface_1: "{{ nic_information_json['interface_1'] }}"
+    interface_2: "{{ nic_information_json['interface_2'] }}"
+- debug:
+    msg: "{{ nic_information_json }}"
+- set_fact:
+    ip_address_1: "{{ nic_information_json['nic'][interface_1]['ipaddr'] }}"
+    ip_address_2: "{{ nic_information_json['nic'][interface_2]['ipaddr'] }}"
+    netmask_1: "{{ nic_information_json['nic'][interface_1]['netmask'] }}"
+    netmask_2: "{{ nic_information_json['nic'][interface_2]['netmask'] }}"
+    gateway: "{{ nic_information_json['gateway']['ipaddr'] }}"
+- set_fact:
+    # controller-node defined in inventory.txt
+    controller_ip_addr: "{{ hostvars['controller-node']['ip_address_1'] }}"
+- debug:
+    msg: "{{ ip_address_1 }} {{ ip_address_2 }}"
+- set_fact:
+    node_type: >-
+      {%- if inventory_hostname in groups['compute'] -%}
+      compute
+      {%- elif inventory_hostname in groups['controller'] -%}
+      controller
+      {%- else -%}
+      error
+      {%- endif -%}
+    is_compute: "{{ inventory_hostname in groups['compute'] }}"
+    is_controller: "{{ inventory_hostname in groups['controller'] }}"

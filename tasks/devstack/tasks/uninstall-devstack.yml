@@ -1,0 +1,16 @@
+- name: "Uninstall devstack-openstack"  # because devstack stack.sh is not idempotent
+  block:
+    - name: "Set clean.sh permission as executable"
+      file:
+        path: ~/devstack/clean.sh
+        mode: "0777"
+    - name: running clean.sh
+      shell:
+        cmd:  "~/devstack/clean.sh 2>&1 > clean_sh_log.txt"
+        chdir: ~/devstack
+    - name: copy clean_sh_log.txt log
+      fetch:
+        src: "~/devstack/clean_sh_log.txt"
+        dest: "./temp/devstack-clean_sh-{{ node_type }}.txt"
+        fail_on_missing: yes
+        flat: yes

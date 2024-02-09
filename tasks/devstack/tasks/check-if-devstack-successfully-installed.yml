@@ -1,0 +1,21 @@
+- set_fact:
+    devstack_installation_log_file: "/opt/stack/logs/stack.sh.log"
+- name: Check that the somefile.conf exists
+  stat:
+    path: "{{ devstack_installation_log_file }}"
+  register: stat_result
+
+- name: Check if devstack already installed successfully
+  lineinfile:
+    dest: "{{ devstack_installation_log_file }}"
+    line: "DevStack Component Timing"  # must be **whole** one line, not substring.
+  check_mode: yes
+  register: presence
+- name: Check if devstack already installed successfully
+  lineinfile:
+    dest: "{{ devstack_installation_log_file }}"
+    line: "Services are running under systemd unit files."  # must be **whole** one line
+  check_mode: yes
+  register: presence2
+- set_fact:  # set true iif (log-file exists and those lines exists)
+    devstack_already_installed_successfully: "{{ stat_result.stat.exists and (not presence.changed) and (not presence2.changed) }}"

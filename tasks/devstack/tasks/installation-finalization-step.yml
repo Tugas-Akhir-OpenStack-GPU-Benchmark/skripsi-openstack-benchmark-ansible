@@ -1,0 +1,36 @@
+- when: is_controller
+  block:
+    - name: copy admin-openrc.sh to server
+      template:
+        src: ../data/admin-openrc.sh
+        dest: "{{base_path}}/admin-openrc.sh"
+        mode: 0777
+    - set_fact:
+        admin_password_cmd_arg: "\"{{ admin_password }}\""
+    - set_fact:
+        source_admin_openrc_cmd: ". \"{{base_path}}/admin-openrc.sh\" {{ admin_password_cmd_arg }} &&"
+        os_password_flag: "--os-password {{ admin_password_cmd_arg }}"
+    - name: get controller hostname
+      command: "hostname"
+      register: controller_host_name
+      failed_when: "controller_host_name.rc != 0 or (controller_host_name.stdout | length == 0)"
+    - debug:
+        var: controller_host_name.stdout
+    - set_fact:
+        controller_host_name: "{{ controller_host_name.stdout }}"
+    - name: disable Nova from controller-node
+      shell: "{{ source_admin_openrc_cmd }} openstack compute service set --disable \"{{ controller_host_name }}\" nova-compute {{ os_password_flag }}"
+
+    - name: fetch information about where Nova was installed
+      shell: "{{ source_admin_openrc_cmd }}  openstack compute service list -f json {{ os_password_flag }}"
+      register: nodes_with_nova_installed
+    - set_fact:
+        nodes_with_nova_installed: "{{ nodes_with_nova_installed.stdout }}"
+    - debug:
+        var: nodes_with_nova_installed
+
+
+    # Prevent error Host 'COMPUTE_NODE_HOST' is not mapped to any cell
+    # by https://github.com/reachsrirams/openstack-scripts/issues/28
+    - name: "nova-manage cell_v2 discover_hosts"
+      shell: "{{ source_admin_openrc_cmd }} nova-manage cell_v2 discover_hosts --verbose"

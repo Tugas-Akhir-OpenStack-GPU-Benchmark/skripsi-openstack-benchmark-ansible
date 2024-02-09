@@ -1,0 +1,19 @@
+- when: is_controller
+  block:
+    - name: "Waiting for ubuntu to be downloaded successfully"
+      async_status:
+        jid: "{{ async_download_ubuntu_image.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      # timeout for about 6200 * 2 = 12400 seconds (speed should be at least 60 KBPS, or it will timeout otherwise)
+      retries: 6200
+      delay: 2
+
+    - name: "Insert Ubuntu image to OpenStack"
+      shell: >- 
+        {{ source_admin_openrc_cmd }} openstack image create Ubuntu2004 
+        --file "{{ ubuntu_image_download_location }}" 
+        --disk-format qcow2 
+        --container-format bare 
+        --public
+        {{ os_password_flag }}
