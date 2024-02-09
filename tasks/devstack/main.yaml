@@ -48,13 +48,17 @@
       register: "check_user_exists"
       failed_when: false
     - name: "create `stack` user if not exists"
-      command: "useradd -s /bin/bash -d /opt/stack -m stack"
+      command: "useradd -G systemd-journal -s /bin/bash -d /opt/stack -m stack"
       when: "check_user_exists.rc != 0"
+    - name: "allow logging in to stack without password"
+      command: "passwd -d stack"
+      become: true
     - name: "Set /opt/stack permission as executable"
       become: yes
       file:
         path: /opt/stack
-        mode: +x
+#        mode: +x
+        mode: 0777
 #    - community.general.sudoers:
 #        name: stack
 #        nopassword: true
@@ -83,21 +87,28 @@
         - fail:
             msg: "Failed to authorized as `stack`"
           when: "whoami.stdout != 'stack'"
-        - name: Ensure .ssh folder exists
-          file:
-            path: ~/.ssh
-            state: directory
-            mode: "0700"
-        - name: Transfer private key
+        - name: Upload logging-viewer script
           copy:
-            src: "./data/gcp"
-            dest: "~/.ssh/gcp"
-            mode: "0700"
-        - name: Transfer public key
-          copy:
-            src: "./data/gcp.pub"
-            dest: "~/.ssh/gcp.pub"
-            mode: "0700"
+            src: "./data/view-log.py"
+            dest: "~/view-log.py"
+            mode: "0777"
+        - name: ssh-related
+          block:
+            - name: Ensure .ssh folder exists
+              file:
+                path: ~/.ssh
+                state: directory
+                mode: "0700"
+            - name: Transfer private key
+              copy:
+                src: "./data/gcp"
+                dest: "~/.ssh/gcp"
+                mode: "0700"
+            - name: Transfer public key
+              copy:
+                src: "./data/gcp.pub"
+                dest: "~/.ssh/gcp.pub"
+                mode: "0700"
         - name: Ensure devstack folder exists
           file:
             path: ~/devstack
@@ -117,6 +128,12 @@
             path: ~/devstack/stack.sh
             regexp: 'GIT_DEPTH=0 git_clone'
             replace: 'GIT_DEPTH=1 git_clone'
+            backup: yes
+        - name: add GIT_DEPTH=1 inside functions-common to increase performance
+          replace:
+            path: ~/devstack/functions-common
+            regexp: 'local orig_dir\n'  # need to specify trailing new line to ensure idempotent
+            replace: "local orig_dir #\nlocal GIT_DEPTH=1\n"
             backup: yes
         - set_fact:
             node_type: >-
@@ -152,6 +169,22 @@
               file:
                 path: ~/devstack/local.sh
                 mode: "0777"
+        - name: "Uninstall devstack-openstack"  # because devstack stack.sh is not idempotent
+          block:
+            - name: "Set clean.sh permission as executable"
+              file:
+                path: ~/devstack/clean.sh
+                mode: "0777"
+            - name: running clean.sh
+              shell:
+                cmd:  "~/devstack/clean.sh 2>&1 > clean_sh_log.txt"
+                chdir: ~/devstack
+            - name: copy clean_sh_log.txt log
+              fetch:
+                src: "~/devstack/clean_sh_log.txt"
+                dest: "./temp/devstack-clean_sh-{{ node_type }}.txt"
+                fail_on_missing: yes
+                flat: yes
         - name: "Set stack.sh permission as executable"
           file:
             path: ~/devstack/stack.sh
