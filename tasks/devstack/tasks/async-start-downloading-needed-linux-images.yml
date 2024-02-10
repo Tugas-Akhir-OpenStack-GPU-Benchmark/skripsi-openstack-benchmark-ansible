@@ -2,6 +2,7 @@
   block:
     - set_fact:
         ubuntu_image_download_location: "/opt/stack/ubuntu-20.04-server-cloudimg-amd64.img"
+        ubuntu_image_openstack_name: "Ubuntu2004"
     - name: Download Ubuntu image
       ansible.builtin.get_url:
         url: http://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-cloudimg-amd64.img
