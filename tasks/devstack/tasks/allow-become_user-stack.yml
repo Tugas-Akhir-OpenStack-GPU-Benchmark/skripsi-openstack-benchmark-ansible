@@ -1,0 +1,8 @@
+- when: "not devstack_already_installed_successfully"
+  block:  # this block is idempotent. This is done just to increase performance
+    - import_tasks: ./tasks/create-user-for-openstack.yml
+    - name: "allow to run ansible become_user: stack"  # see https://stackoverflow.com/a/56379678/7069108
+      apt:
+        update_cache: yes
+        name:
+          - acl
