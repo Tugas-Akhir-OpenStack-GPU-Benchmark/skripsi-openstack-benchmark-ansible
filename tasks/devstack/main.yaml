@@ -7,8 +7,6 @@
     admin_password: "1122"
   tasks:
     - import_tasks: ./tasks/check-if-devstack-successfully-installed.yml
-    - debug:
-        var: devstack_already_installed_successfully
     - import_tasks: ./tasks/get-ip-addr-information.yml
     - import_tasks: ./tasks/allow-become_user-stack.yml
 
