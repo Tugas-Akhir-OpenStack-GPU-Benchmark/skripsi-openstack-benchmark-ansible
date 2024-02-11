@@ -5,6 +5,7 @@
   vars:
     base_path: /opt/stack
     admin_password: "1122"
+    OS_PROJECT_NAME: "demo"  # I think it's the default automatically-created project by the devstack
   tasks:
     - import_tasks: ./tasks/check-if-devstack-successfully-installed.yml
     - import_tasks: ./tasks/get-ip-addr-information.yml

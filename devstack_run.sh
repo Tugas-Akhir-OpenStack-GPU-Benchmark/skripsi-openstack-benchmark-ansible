@@ -15,4 +15,4 @@ export ANSIBLE_EXTRAVARS="ansible_user=stack ansible_ssh_user=immanuel01 ansible
 export ANSIBLE_EXTRAVARS="$ANSIBLE_EXTRAVARS CONTROLLER_SSH_IP=$1 COMPUTE_SSH_IP=$2"
 
 sudo ansible-playbook ./tasks/devstack/main.yaml -i ./tasks/devstack/inventory.yml -e "$ANSIBLE_EXTRAVARS"
-#sudo ansible-playbook ./tasks/devstack/main.yaml -i ./tasks/devstack/inventory.txt -e "$ANSIBLE_EXTRAVARS" --start-at-task="check current username"
+#sudo ansible-playbook ./tasks/devstack/main.yaml -i ./tasks/devstack/inventory.yml -e "$ANSIBLE_EXTRAVARS" --start-at-task="finalization"

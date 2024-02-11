@@ -3,12 +3,14 @@
     src: ../data/admin-openrc.sh
     dest: "{{base_path}}/admin-openrc.sh"
     mode: 0777
-- when: is_controller
+- name: finalization
+  when: is_controller
   block:
     - set_fact:
         admin_password_cmd_arg: "\"{{ admin_password }}\""
     - set_fact:
-        source_admin_openrc_cmd: ". \"{{base_path}}/admin-openrc.sh\" {{ admin_password_cmd_arg }} &&"
+        source_admin_openrc_cmd: >-
+          . "{{base_path}}/admin-openrc.sh" {{ admin_password_cmd_arg }} && export OS_PASSWORD={{ admin_password_cmd_arg }} &&
         os_password_flag: "--os-password {{ admin_password_cmd_arg }}"
     - name: get controller hostname
       command: "hostname"
@@ -34,3 +36,45 @@
     # by https://github.com/reachsrirams/openstack-scripts/issues/28
     - name: "nova-manage cell_v2 discover_hosts"
       shell: "{{ source_admin_openrc_cmd }} nova-manage cell_v2 discover_hosts --verbose"
+#    - debug:
+#        msg: "{{ source_admin_openrc_cmd }} openstack security group list --project 1ec5bc8e6e2e4e059ad8bf70c3290f6c --format json"
+    - name: "get project-ID"
+      shell: >-
+        {{ source_admin_openrc_cmd }} openstack project show -c id -f value "{{ OS_PROJECT_NAME }}"
+      register: project_id
+    - name: "get security-group ID"
+      shell: "{{ source_admin_openrc_cmd }} openstack security group list --project {{ project_id.stdout }} --format json {{ os_password_flag }}"
+      register: security_group_id
+    - set_fact:
+        security_group_id: "{{ security_group_id.stdout }}"
+    - debug:
+        var: security_group_id
+    - set_fact:
+        security_group_id: "{{ security_group_id | selectattr('Name', 'equalto', 'default')  }}"
+    - debug:
+        var: security_group_id
+    - set_fact:
+        security_group_id: "{{ security_group_id | map(attribute='ID')  }}"
+    - debug:
+        var: security_group_id
+    - set_fact:
+        security_group_id: "{{ security_group_id | first  }}"
+    - debug:
+        var: security_group_id
+
+    - name: "Allow ICMP to openstack default security-group"
+      shell: "{{ source_admin_openrc_cmd }} openstack security group rule create --proto icmp {{ security_group_id }}"
+      register: rule_creation
+      failed_when: "rule_creation.rc != 0 and 'already exists' not in rule_creation.stderr"
+      changed_when: "'already exists' not in rule_creation.stderr"
+    - debug:
+        msg: "{{ rule_creation.rc }} -> {{ rule_creation.stderr }}"
+      when: "rule_creation.rc != 0"
+    - name: "Allow SSH to openstack default security-group"
+      shell: "{{ source_admin_openrc_cmd }} openstack security group rule create --proto tcp --dst-port 22 {{ security_group_id }} {{ os_password_flag }}"
+      register: rule_creation
+      failed_when: "rule_creation.rc != 0 and 'already exists' not in rule_creation.stderr"
+      changed_when: "'already exists' not in rule_creation.stderr"
+    - debug:
+        msg: "{{ rule_creation.rc }} -> {{ rule_creation.stderr }}"
+      when: "rule_creation.rc != 0"
