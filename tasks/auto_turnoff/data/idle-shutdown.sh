@@ -3,12 +3,12 @@
 #   instance-name --metadata-from-file startup-script=idle-shutdown.sh` and reboot
 # NOTE: requires `bc`, eg, sudo apt-get install bc
 # Modified from https://stackoverflow.com/questions/30556920/how-can-i-automatically-kill-idle-gce-instances-based-on-cpu-usage
-threshold=0.05
+threshold=0.12
 
 printf "Hello, starting up at $(date) \n" >> log.txt
 
 count=0
-wait_minutes=60
+wait_minutes=50
 while true
 do
 
