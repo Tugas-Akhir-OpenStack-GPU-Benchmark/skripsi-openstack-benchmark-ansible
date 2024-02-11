@@ -18,7 +18,7 @@ def main(assert_nic_exists: list[str]):
         if startswith_any(key, "ens", "eth", "vlan")
     }
     list_of_nic = set(nic_information.keys())
-    assert len(list_of_nic) >= 2, "At least 2 NIC should be installed"
+    # assert len(list_of_nic) >= 2, "At least 2 NIC should be installed"
 
     for nic in assert_nic_exists:
         assert nic in nic_information
@@ -48,6 +48,8 @@ def get_default_gateway_linux():
 
 
 def unpack_set(set_: set):
+    if len(set_) == 0:
+        return None
     sorted_set = sorted(set_)
     return sorted_set[0]
 

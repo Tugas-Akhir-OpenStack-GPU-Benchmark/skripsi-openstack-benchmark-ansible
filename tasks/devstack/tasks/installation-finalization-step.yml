@@ -1,10 +1,10 @@
+- name: copy admin-openrc.sh to server
+  template:
+    src: ../data/admin-openrc.sh
+    dest: "{{base_path}}/admin-openrc.sh"
+    mode: 0777
 - when: is_controller
   block:
-    - name: copy admin-openrc.sh to server
-      template:
-        src: ../data/admin-openrc.sh
-        dest: "{{base_path}}/admin-openrc.sh"
-        mode: 0777
     - set_fact:
         admin_password_cmd_arg: "\"{{ admin_password }}\""
     - set_fact:

@@ -22,20 +22,20 @@
     nic_information_json: "{{ nic_information_json.stdout }}"
 - set_fact:
     interface_1: "{{ nic_information_json['interface_1'] }}"
-    interface_2: "{{ nic_information_json['interface_2'] }}"
+#    interface_2: "{{ nic_information_json['interface_2'] }}"
 - debug:
     msg: "{{ nic_information_json }}"
 - set_fact:
     ip_address_1: "{{ nic_information_json['nic'][interface_1]['ipaddr'] }}"
-    ip_address_2: "{{ nic_information_json['nic'][interface_2]['ipaddr'] }}"
+#    ip_address_2: "{{ nic_information_json['nic'][interface_2]['ipaddr'] }}"
     netmask_1: "{{ nic_information_json['nic'][interface_1]['netmask'] }}"
-    netmask_2: "{{ nic_information_json['nic'][interface_2]['netmask'] }}"
+#    netmask_2: "{{ nic_information_json['nic'][interface_2]['netmask'] }}"
     gateway: "{{ nic_information_json['gateway']['ipaddr'] }}"
 - set_fact:
     # controller-node defined in inventory.txt
     controller_ip_addr: "{{ hostvars['controller-node']['ip_address_1'] }}"
 - debug:
-    msg: "{{ ip_address_1 }} {{ ip_address_2 }}"
+    var: ip_address_1
 - set_fact:
     node_type: >-
       {%- if inventory_hostname in groups['compute'] -%}
