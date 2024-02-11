@@ -6,7 +6,11 @@
     base_path: /opt/stack
     admin_password: "1122"
     OS_PROJECT_NAME: "demo"  # I think it's the default automatically-created project by the devstack
+    parent_directory: "{{ inventory_dir | dirname }}"
   tasks:
+    - name: convert all ansible-related file to LF end-of-line
+      command: "python3 ./data/convert-all-crlf-to-lf.py \"{{parent_directory}}\""
+      delegate_to: "localhost"
     - import_tasks: ./tasks/check-if-devstack-successfully-installed.yml
     - import_tasks: ./tasks/get-ip-addr-information.yml
     - import_tasks: ./tasks/allow-become_user-stack.yml
