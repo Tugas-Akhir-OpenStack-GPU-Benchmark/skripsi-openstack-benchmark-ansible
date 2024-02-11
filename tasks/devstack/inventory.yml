@@ -1,0 +1,8 @@
+controller:
+  hosts:
+    controller-node:
+      ansible_host: "{{ CONTROLLER_SSH_IP }}"
+compute:
+  hosts:
+    compute-node-1:
+      ansible_host: "{{ COMPUTE_SSH_IP }}"
