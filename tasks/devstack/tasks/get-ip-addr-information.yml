@@ -5,6 +5,7 @@
     update_cache: yes
     name:
       - git
+      - python3-novaclient
       - net-tools
       - python3-pip
   when: "not devstack_already_installed_successfully"  # just to increase performance
