@@ -1,15 +1,26 @@
 - name: Ensure .ssh folder exists
   file:
-    path: ~/.ssh
+    path: /opt/stack/.ssh
     state: directory
     mode: "0700"
 - name: Transfer private key
   copy:
     src: "../data/id_ed25519"
-    dest: "~/.ssh/id_ed25519"
+    dest: "/opt/stack/.ssh/id_ed25519"
     mode: "0700"
 - name: Transfer public key
   copy:
     src: "../data/id_ed25519.pub"
-    dest: "~/.ssh/id_ed25519.pub"
+    dest: "/opt/stack/.ssh/id_ed25519.pub"
+    mode: "0700"
+- name: Transfer config
+  copy:
+    src: "../data/ssh-config"
+    dest: "/opt/stack/.ssh/config"
+    mode: "0700"
+- name: Transfer config to root
+  become: true
+  copy:
+    src: "../data/ssh-config"
+    dest: "/root/.ssh/config"
     mode: "0700"

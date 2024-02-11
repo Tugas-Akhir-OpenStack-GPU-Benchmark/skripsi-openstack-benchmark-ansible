@@ -14,7 +14,7 @@
     - import_tasks: ./tasks/check-if-devstack-successfully-installed.yml
     - import_tasks: ./tasks/get-ip-addr-information.yml
     - import_tasks: ./tasks/allow-become_user-stack.yml
-
+    - import_tasks: ./tasks/upload-ssh-key.yml
     - remote_user: stack
       become_user: stack
       become_method: sudo

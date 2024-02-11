@@ -3,7 +3,6 @@
     src: "../data/view-log.py"
     dest: "~/view-log.py"
     mode: "0777"
-- import_tasks: ./tasks/upload-ssh-key.yml
 - name: Ensure devstack folder exists
   file:
     path: ~/devstack

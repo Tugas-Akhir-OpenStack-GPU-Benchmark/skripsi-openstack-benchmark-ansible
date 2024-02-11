@@ -1,0 +1,4 @@
+IdentityFile /opt/stack/.ssh/id_ed25519
+StrictHostKeyChecking no
+UserKnownHostsFile=/dev/null
+
