@@ -7,6 +7,7 @@
     admin_password: "1122"
     OS_PROJECT_NAME: "demo"  # I think it's the default automatically-created project by the devstack
     parent_directory: "{{ inventory_dir | dirname }}"
+    devstack_floating_ip_range: "192.168.42.128/25"  # I think we should carefully fill-in this value, based on our host machine situation
   tasks:
     - name: convert all ansible-related file to LF end-of-line
       command: "python3 ./data/convert-all-crlf-to-lf.py \"{{parent_directory}}\""
