@@ -12,6 +12,12 @@
         source_admin_openrc_cmd: >-
           . "{{base_path}}/admin-openrc.sh" {{ admin_password_cmd_arg }} && export OS_PASSWORD={{ admin_password_cmd_arg }} &&
         os_password_flag: "--os-password {{ admin_password_cmd_arg }}"
+    - name: "Register public key to OpenStack"
+      shell: >-
+        sudo bash -c '{{ source_admin_openrc_cmd }} openstack keypair create --public "{{ ssh_key_destination_path }}.pub" created_by_ansible'
+      register: result
+      failed_when: "result.rc != 0 and 'already exists' not in result.stderr"
+      changed_when: "'already exists' not in result.stderr"
     - name: get controller hostname
       command: "hostname"
       register: controller_host_name

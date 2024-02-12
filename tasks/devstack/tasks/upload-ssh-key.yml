@@ -6,21 +6,21 @@
 - name: Transfer private key
   copy:
     src: "../data/id_ed25519"
-    dest: "/opt/stack/.ssh/id_ed25519"
+    dest: "{{ ssh_key_destination_path }}"
     mode: "0700"
 - name: Transfer public key
   copy:
     src: "../data/id_ed25519.pub"
-    dest: "/opt/stack/.ssh/id_ed25519.pub"
+    dest: "{{ ssh_key_destination_path }}.pub"
     mode: "0700"
 - name: Transfer config
-  copy:
+  template:
     src: "../data/ssh-config"
     dest: "/opt/stack/.ssh/config"
     mode: "0700"
 - name: Transfer config to root
   become: true
-  copy:
+  template:
     src: "../data/ssh-config"
     dest: "/root/.ssh/config"
     mode: "0700"
