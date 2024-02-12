@@ -11,9 +11,14 @@
 
     devstack_floating_ip_range: "10.132.2.0/26"  # I think we should carefully fill-in this value, based on our host machine situation
   tasks:
+    - debug:
+        msg: "python3 ./data/convert-all-crlf-to-lf.py \"{{parent_directory}}\""
     - name: convert all ansible-related file to LF end-of-line
-      command: "python3 ./data/convert-all-crlf-to-lf.py \"{{parent_directory}}\""
+      command: "python3 ./data/convert-all-crlf-to-lf.py \"{{parent_directory}}\" 2>&1"
       delegate_to: "localhost"
+      register: result
+    - debug:
+        var: result
     - import_tasks: ./tasks/check-if-devstack-successfully-installed.yml
     - import_tasks: ./tasks/get-ip-addr-information.yml
     - import_tasks: ./tasks/allow-become_user-stack.yml

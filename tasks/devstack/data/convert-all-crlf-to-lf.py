@@ -26,6 +26,10 @@ def is_binary_string(string: bytes):
 
 def is_binary_file(file_path: str, read_block_size=10 * 1024 * 1024):
     with open(file_path, "rb") as f:
+        content = f.read()
+    print(f"Converting 1: {file_path} {len(content)}")
+
+    with open(file_path, "rb") as f:
         while True:
             content = f.read(read_block_size)
             if is_binary_string(content):
@@ -41,11 +45,25 @@ def convert_to_LF_EOL(file_path: str):
         warnings.warn(f"\n Skipping... Detected as a binary file: {file_path} \n", stacklevel=2)
         return
     with open(file_path, "rb") as f:
+        f.seek(0)
         content = f.read()
-        content = content.replace(b"\r\n", b"\n")
+        f.close()
+
+    for i in range(3):
+        print(f"Converting 2-{i}: {file_path} {len(content)}")
+        with open(file_path, "rb") as f:
+            f.seek(0)
+            content = f.read()
+            f.close()
+        if len(content) != 0:
+            break
+
+    print(f"Converting 3: {file_path} {len(content)}")
+    content = content.replace(b"\r\n", b"\n")
+
     with open(file_path, "wb") as f:
         f.write(content)
-    print(f"Converted: {file_path}")
+    print(f"Converted: {file_path} {len(content)}")
 
 
 if __name__ == "__main__":
