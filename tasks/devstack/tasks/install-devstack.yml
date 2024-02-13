@@ -4,12 +4,12 @@
     mode: "0777"
 - name: running stack.sh for controller node  # need to setup controller first, then the compute node
   shell:  # around 25 minutes
-    cmd:  "nohup ~/devstack/stack.sh 2>&1 > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
+    cmd:  "nohup ~/devstack/stack.sh > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
     chdir: ~/devstack
   when: is_controller
 - name: running stack.sh for compute node
   shell:  # around 12 minutes
-    cmd:  "nohup ~/devstack/stack.sh 2>&1 > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
+    cmd:  "nohup ~/devstack/stack.sh > ./nohup.out"  # nohup will ensure to keep running the scripts even if ssh-disconnected
     chdir: ~/devstack
   when: is_compute
 - name: copy stack.sh log
