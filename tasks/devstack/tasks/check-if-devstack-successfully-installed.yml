@@ -22,6 +22,7 @@
   register: presence2
   when: "devstack_logfile_exists"
 - set_fact:  # set true iif (log-file exists and those lines exists)
-    devstack_already_installed_successfully: "{{ devstack_logfile_exists and (not presence.changed) and (not presence2.changed) }}"
+    devstack_already_installed_successfully: >-
+      {{ devstack_logfile_exists and (not presence.changed) and (not presence2.changed) and not force_reinstall }}
 - debug:
     var: devstack_already_installed_successfully

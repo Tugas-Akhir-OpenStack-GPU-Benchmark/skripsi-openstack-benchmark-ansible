@@ -8,6 +8,7 @@
     OS_PROJECT_NAME: "demo"  # I think it's the default automatically-created project by the devstack
     parent_directory: "{{ inventory_dir | dirname }}"
     ssh_key_destination_path: "/opt/stack/.ssh/id_ed25519"
+    force_reinstall: false
 
     devstack_floating_ip_range: "10.132.2.0/26"  # I think we should carefully fill-in this value, based on our host machine situation
   tasks:
