@@ -12,6 +12,7 @@
 
     # Isi dengan subnet yang tidak intersect dengan subnet2 yang ada di komputer host (both compute maupun controller node)
     # Dengan begitu nanti dari CONTROLLER node kita bisa ping ke floating IP
+    # Tapi untuk saat ini masih belum bisa SSH pake floating-ip
     devstack_floating_ip_range: "10.101.10.0/24"
 
     devstack_q_floating_allocation_pool_start: "10.101.10.100"  # should be subset of devstack_floating_ip_range
