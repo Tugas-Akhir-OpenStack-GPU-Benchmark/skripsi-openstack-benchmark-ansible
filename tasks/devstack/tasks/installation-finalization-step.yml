@@ -95,6 +95,18 @@
         msg: "{{ rule_creation.rc }} -> {{ rule_creation.stderr }}"
       when: "rule_creation.rc != 0"
 
+    - name: "Add 8.8.8.8 and 8.8.4.4 to OpenStack's DHCP server as the default DNS server"
+      shell: "{{ source_admin_openrc_cmd }} openstack subnet set --dns-nameserver 8.8.8.8 --dns-nameserver 8.8.4.4 private-subnet"
+      register: rule_creation
+      failed_when: "rule_creation.rc != 0 and 'Duplicate nameserver' not in rule_creation.stderr"
+      changed_when: "'Duplicate nameserver' not in rule_creation.stderr"
+
+    - name: "Add 8.8.8.8 and 8.8.4.4 to OpenStack's DHCP server as the default DNS server"
+      shell: "{{ source_admin_openrc_cmd }} openstack subnet set --dns-nameserver 8.8.8.8 --dns-nameserver 8.8.4.4 public-subnet"
+      register: rule_creation
+      failed_when: "rule_creation.rc != 0 and 'Duplicate nameserver' not in rule_creation.stderr"
+      changed_when: "'Duplicate nameserver' not in rule_creation.stderr"
+
 
 - name: "install helpful debugging packages"
   become: true
