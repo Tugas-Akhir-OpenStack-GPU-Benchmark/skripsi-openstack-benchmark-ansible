@@ -10,9 +10,10 @@
     ssh_key_destination_path: "/opt/stack/.ssh/id_ed25519"
     force_reinstall: false
 
-    # Isi dengan subnet yang tidak intersect dengan subnet2 yang ada di komputer host (both compute maupun controller node)
-    # Dengan begitu nanti dari CONTROLLER node kita bisa ping ke floating IP
-    # Tapi untuk saat ini masih belum bisa SSH pake floating-ip
+    # Coba jalanin `ifconfig` di controller-node, dan cek Netmask dari physical interfacenya.
+    # Kalau netmasknya /32, isi field ini dengan subnet yang tidak intersect dengan subnet2 yang ada
+    # di komputer host (both compute maupun controller node)
+    # Dengan begitu nanti dari CONTROLLER node kita bisa ping ke floating IP (tp untuk saat ini msh blom bisa SSH)
     devstack_floating_ip_range: "10.101.10.0/24"
 
     devstack_q_floating_allocation_pool_start: "10.101.10.100"  # should be subset of devstack_floating_ip_range
