@@ -8,11 +8,14 @@
     OS_PROJECT_NAME: "demo"  # I think it's the default automatically-created project by the devstack
     parent_directory: "{{ inventory_dir | dirname }}"
     ssh_key_destination_path: "/opt/stack/.ssh/id_ed25519"
-    force_reinstall: true
+    force_reinstall: false
 
-    devstack_floating_ip_range: "10.178.0.0/20"  # I think we should carefully fill-in this value, based on our host machine situation
-    devstack_q_floating_allocation_pool_start: "10.178.161.250"  # should be subset of devstack_floating_ip_range
-    devstack_q_floating_allocation_pool_end: "10.178.161.254"  # should be subset of devstack_floating_ip_range
+    # Isi dengan subnet yang tidak intersect dengan subnet2 yang ada di komputer host (both compute maupun controller node)
+    # Dengan begitu nanti dari CONTROLLER node kita bisa ping ke floating IP
+    devstack_floating_ip_range: "10.101.10.0/24"
+
+    devstack_q_floating_allocation_pool_start: "10.101.10.100"  # should be subset of devstack_floating_ip_range
+    devstack_q_floating_allocation_pool_end: "10.101.10.254"  # should be subset of devstack_floating_ip_range
   tasks:
     - debug:
         msg: "python3 ./data/convert-all-crlf-to-lf.py \"{{parent_directory}}\""
@@ -24,6 +27,7 @@
         var: result
     - import_tasks: ./tasks/check-if-devstack-successfully-installed.yml
     - import_tasks: ./tasks/get-ip-addr-information.yml
+    - import_tasks: ./tasks/insert_new_veth.yml
     - import_tasks: ./tasks/allow-become_user-stack.yml
     - import_tasks: ./tasks/upload-ssh-key.yml
     - remote_user: stack

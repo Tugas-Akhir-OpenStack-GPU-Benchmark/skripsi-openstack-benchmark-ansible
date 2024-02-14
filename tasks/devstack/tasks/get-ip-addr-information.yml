@@ -1,12 +1,11 @@
 - name: ensure base_path exists
   command: "mkdir -p {{ base_path }}"
-- name: "install git, ifconfig, pip3"
+- name: "install required packages"
   apt:
     update_cache: yes
     name:
       - git
       - python3-novaclient
-      - net-tools
       - python3-pip
   when: "not devstack_already_installed_successfully"  # just to increase performance
 # Get information about NIC

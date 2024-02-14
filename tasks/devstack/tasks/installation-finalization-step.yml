@@ -94,3 +94,13 @@
     - debug:
         msg: "{{ rule_creation.rc }} -> {{ rule_creation.stderr }}"
       when: "rule_creation.rc != 0"
+
+
+- name: "install helpful debugging packages"
+  become: true
+  become_user: root
+  apt:
+    update_cache: yes
+    name:
+      - net-tools
+      - bridge-utils
