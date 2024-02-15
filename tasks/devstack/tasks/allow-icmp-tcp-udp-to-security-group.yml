@@ -1,0 +1,18 @@
+
+- name: "Allow ICMP to openstack default security-group"
+  shell: "{{ source_admin_openrc_cmd }} openstack security group rule create --proto icmp {{ item }}"
+  register: rule_creation
+  failed_when: "rule_creation.rc != 0 and 'already exists' not in rule_creation.stderr"
+  changed_when: "'already exists' not in rule_creation.stderr"
+
+- name: "Allow all TCP to openstack default security-group"
+  shell: "{{ source_admin_openrc_cmd }} openstack security group rule create --proto tcp --dst-port 1:65535 {{ item }}"
+  register: rule_creation
+  failed_when: "rule_creation.rc != 0 and 'already exists' not in rule_creation.stderr"
+  changed_when: "'already exists' not in rule_creation.stderr"
+
+- name: "Allow all UDP to openstack default security-group"
+  shell: "{{ source_admin_openrc_cmd }} openstack security group rule create --proto udp --dst-port 1:65535 {{ item }}"
+  register: rule_creation
+  failed_when: "rule_creation.rc != 0 and 'already exists' not in rule_creation.stderr"
+  changed_when: "'already exists' not in rule_creation.stderr"
