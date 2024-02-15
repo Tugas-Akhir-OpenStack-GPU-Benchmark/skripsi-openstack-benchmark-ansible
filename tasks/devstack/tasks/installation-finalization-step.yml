@@ -21,13 +21,18 @@
     - name: get controller hostname
       command: "hostname"
       register: controller_host_name
-      failed_when: "controller_host_name.rc != 0 or (controller_host_name.stdout | length == 0)"
+      failed_when: "controller_host_name.rc != 0 or (controller_host_name.stdout | length | int == 0)"
     - debug:
         var: controller_host_name.stdout
     - set_fact:
         controller_host_name: "{{ controller_host_name.stdout }}"
     - name: disable Nova from controller-node
-      shell: "{{ source_admin_openrc_cmd }} openstack compute service set --disable \"{{ controller_host_name }}\" nova-compute {{ os_password_flag }}"
+      shell: >-
+        {{ source_admin_openrc_cmd }} openstack compute service set --disable "{{ controller_host_name }}" nova-compute
+    - name: disable Cinder from controller-node
+      shell: >-
+        {{ source_admin_openrc_cmd }} openstack volume service set --disable "{{ controller_host_name }}@lvmdriver-1" 
+        cinder-volume
 
     - name: fetch information about where Nova was installed
       shell: "{{ source_admin_openrc_cmd }}  openstack compute service list -f json {{ os_password_flag }}"
@@ -53,16 +58,10 @@
       register: security_group_id
     - set_fact:
         security_group_id: "{{ security_group_id.stdout }}"
-    - debug:
-        var: security_group_id
     - set_fact:
         security_group_id: "{{ security_group_id | selectattr('Name', 'equalto', 'default')  }}"
-    - debug:
-        var: security_group_id
     - set_fact:
         security_group_id: "{{ security_group_id | map(attribute='ID')  }}"
-    - debug:
-        var: security_group_id
     - set_fact:
         security_group_id: "{{ security_group_id | first  }}"
     - debug:
@@ -106,7 +105,6 @@
       register: rule_creation
       failed_when: "rule_creation.rc != 0 and 'Duplicate nameserver' not in rule_creation.stderr"
       changed_when: "'Duplicate nameserver' not in rule_creation.stderr"
-
 
 - name: "install helpful debugging packages"
   become: true
