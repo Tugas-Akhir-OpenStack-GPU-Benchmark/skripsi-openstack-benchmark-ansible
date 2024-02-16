@@ -18,4 +18,4 @@ export ANSIBLE_EXTRAVARS="$ANSIBLE_EXTRAVARS CONTROLLER_SSH_IP=$1 COMPUTE_SSH_IP
 export ANSIBLE_CACHE_PLUGIN=jsonfile
 
 sudo ansible-playbook ./tasks/devstack/main.yaml -i ./tasks/devstack/inventory.yml -e "$ANSIBLE_EXTRAVARS"
-#sudo ansible-playbook ./tasks/devstack/main.yaml -i ./tasks/devstack/inventory.yml -e "$ANSIBLE_EXTRAVARS" --start-at-task="finalization"
+#sudo ansible-playbook ./tasks-openstack-core/devstack/main.yaml -i ./tasks-openstack-core/devstack/inventory.yml -e "$ANSIBLE_EXTRAVARS" --start-at-task="finalization"

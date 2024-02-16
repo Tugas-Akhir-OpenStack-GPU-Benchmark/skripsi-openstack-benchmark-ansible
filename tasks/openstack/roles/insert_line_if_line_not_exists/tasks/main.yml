@@ -1,5 +1,5 @@
 ---
-# tasks file for insert_line_if_line_not_exists
+# tasks-openstack-core file for insert_line_if_line_not_exists
 
 - fail:
     msg: "Argument '{{ item }}' is not specified, but it's mandatory"

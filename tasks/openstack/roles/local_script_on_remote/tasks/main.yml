@@ -1,5 +1,5 @@
 ---
-# tasks file for local_script_on_remote
+# tasks-openstack-core file for local_script_on_remote
 - fail:
     msg: "Argument '{{ item }}' is not specified, but it's mandatory"
   when: "lookup('vars', item) == ''"

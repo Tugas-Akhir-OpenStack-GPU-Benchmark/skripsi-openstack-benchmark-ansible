@@ -1,5 +1,5 @@
 ---
-# tasks file for keystone
+# tasks-openstack-core file for keystone
 # See https://docs.openstack.org/keystone/queens/install/keystone-install-ubuntu.html#install-and-configure-components
 
 - block:

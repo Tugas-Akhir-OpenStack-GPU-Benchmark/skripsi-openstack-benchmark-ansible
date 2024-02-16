@@ -27,7 +27,7 @@
     that:
       - "NAMD_f1atpase_exists.stat.exists"
 
-# Two tasks below need to be done manually because somehow the Phoronix's NAMD installation through ansible
+# Two tasks-openstack-core below need to be done manually because somehow the Phoronix's NAMD installation through ansible
 # is not working properly, although it works if we do SSH manually and *initiate* the phoronix NAMD installation manually
 
 

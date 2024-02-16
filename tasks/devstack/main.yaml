@@ -24,24 +24,24 @@
       register: result
     - debug:
         var: result
-    - import_tasks: ./tasks/check-if-devstack-successfully-installed.yml
-    - import_tasks: ./tasks/get-ip-addr-information.yml
-    - import_tasks: ./tasks/insert_new_veth.yml
-    - import_tasks: ./tasks/allow-become_user-stack.yml
-    - import_tasks: ./tasks/upload-ssh-key.yml
+    - import_tasks: tasks-openstack-core/01-check-if-devstack-successfully-installed.yml
+    - import_tasks: tasks-openstack-core/02-get-ip-addr-information.yml
+    - import_tasks: tasks-openstack-core/03-allow-ip-forwarding-and-enable-nat.yml
+    - import_tasks: tasks-openstack-core/04-allow-become_user-stack.yml
+    - import_tasks: tasks-openstack-core/05-upload-ssh-key.yml
     - remote_user: stack
       become_user: stack
       become_method: sudo
       block:
-        - import_tasks: ./tasks/assert-logged-in-to-the-correct-user.yml
-        - import_tasks: ./tasks/async-start-downloading-needed-linux-images.yml
+        - import_tasks: tasks-openstack-core/06-assert-logged-in-to-the-correct-user.yml
+        - import_tasks: tasks-openstack-core/07-async-start-downloading-needed-linux-images.yml
         - when: "not devstack_already_installed_successfully"
           block:
-            - import_tasks: ./tasks/prepare-installation-script.yml
-            - import_tasks: ./tasks/setup-devstack-configuration.yml
-            - import_tasks: ./tasks/uninstall-devstack.yml
-            - import_tasks: ./tasks/install-devstack.yml
-        - import_tasks: ./tasks/installation-finalization-step.yml
-        - import_tasks: ./tasks/insert-downloaded-linux-images-to-openstack.yml
-        - import_tasks: ./tasks/create-nova-instance.yml
+            - import_tasks: tasks-openstack-core/08-prepare-installation-script.yml
+            - import_tasks: tasks-openstack-core/09-setup-devstack-configuration.yml
+            - import_tasks: tasks-openstack-core/10-uninstall-devstack.yml
+            - import_tasks: tasks-openstack-core/11-install-devstack.yml
+        - import_tasks: tasks-configure-nova/01-installation-finalization-step.yml
+        - import_tasks: tasks-openstack-core/12-insert-downloaded-linux-images-to-openstack.yml
+        - import_tasks: tasks-configure-nova/02-create-nova-instance.yml
 

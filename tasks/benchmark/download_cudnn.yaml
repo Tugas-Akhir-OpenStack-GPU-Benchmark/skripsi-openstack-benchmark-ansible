@@ -5,7 +5,7 @@
 
 - import_tasks: ../install_dos2unix.yaml
 
-- command: "dos2unix ./tasks/benchmark/scripts/downloader.py"
+- command: "dos2unix ./tasks-openstack-core/benchmark/scripts/downloader.py"
   delegate_to: localhost
 - name: Upload CUDNN download script
   copy:
@@ -18,7 +18,7 @@
     group: root
     mode: 0777
 
-- command: "dos2unix ./tasks/benchmark/scripts/combiner.py"
+- command: "dos2unix ./tasks-openstack-core/benchmark/scripts/combiner.py"
   delegate_to: localhost
 - name: Upload CUDNN combine script
   copy:
