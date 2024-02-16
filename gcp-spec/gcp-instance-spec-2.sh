@@ -1,4 +1,4 @@
-gcloud compute instances create gpu-jakarta \
+gcloud compute instances create jakarta-gpu-$RANDOM \
     --project=law-2006463162 \
     --zone=asia-southeast2-b \
     --machine-type=custom-4-8448 \

@@ -18,7 +18,26 @@ SRVR_FASILKOM_VARS="ansible_user=admin $SRVR_FASILKOM_VARS"
 
 
 
+if [ -z "$1" ]; then
+    echo "Please provide SSH host (IP address) of the controller-instance as the first argument"
+    exit
+fi
+
+
+ansible_ssh_common_args=''
+
+if [ -n "$2" ]; then
+    ansible_ssh_common_args='$ansible_ssh_common_args -J $2'
+    echo "jumphost 1 detected"
+fi
+
+if [ -n "$3" ]; then
+    ansible_ssh_common_args='$ansible_ssh_common_args $3'
+    echo "jumphost 2 detected"
+fi
+
 
 export ANSIBLE_EXTRAVARS="ansible_host=$1 ansible_user=immanuel01 ansible_ssh_private_key_file=~/.ssh/gcp"
-sudo ansible-playbook ./tasks-openstack-core/benchmark/main.yaml -i ./tasks-openstack-core/benchmark/inventory.txt -e "$ANSIBLE_EXTRAVARS"
-#sudo ansible-playbook ./tasks-openstack-core/benchmark/main.yaml -i ./tasks-openstack-core/benchmark/inventory.txt -e "$ANSIBLE_EXTRAVARS" --start-at-task="chmod prime-run"
+export ANSIBLE_EXTRAVARS="$ANSIBLE_EXTRAVARS ansible_ssh_common_args=\"$ansible_ssh_common_args\""
+sudo ansible-playbook ./tasks/benchmark/main.yaml -i ./tasks/benchmark/inventory.txt -e "$ANSIBLE_EXTRAVARS"
+#sudo ansible-playbook ./tasks/benchmark/main.yaml -i ./tasks/benchmark/inventory.txt -e "$ANSIBLE_EXTRAVARS" --start-at-task="chmod prime-run"
