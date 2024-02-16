@@ -1,5 +1,8 @@
-- name: ensure base_path exists
-  command: "mkdir -p {{ base_path }}"
+- name: Ensure base_path exists
+  ansible.builtin.file:
+    path: "{{ base_path }}"
+    state: directory
+    mode: 0777
 - name: "install required packages"
   apt:
     update_cache: yes

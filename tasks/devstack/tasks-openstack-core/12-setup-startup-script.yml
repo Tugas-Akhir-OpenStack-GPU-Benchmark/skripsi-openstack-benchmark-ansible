@@ -1,0 +1,22 @@
+- set_fact:
+    startup_script_location: "/root/controller-startup-script.sh"
+
+- when: is_controller
+  become: true
+  become_user: root
+  block:
+    - name: Upload booting startup script
+      template:
+        src: "../data/controller-startup-script.sh"
+        dest: "{{ startup_script_location }}"
+        mode: "0755"
+
+    - name: Register startup script to cronjob on reboot
+      cron:
+        name: "Reboot script for Openstack Controller Node"
+        special_time: "reboot"
+        job: "{{ startup_script_location }}"  # The command or script you want to run
+
+
+
+

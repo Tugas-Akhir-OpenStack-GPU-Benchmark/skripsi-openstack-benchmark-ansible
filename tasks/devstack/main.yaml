@@ -41,6 +41,7 @@
             - import_tasks: tasks-openstack-core/09-setup-devstack-configuration.yml
             - import_tasks: tasks-openstack-core/10-uninstall-devstack.yml
             - import_tasks: tasks-openstack-core/11-install-devstack.yml
+        - import_tasks: tasks-openstack-core/12-setup-startup-script.yml
         - import_tasks: tasks-configure-nova/01-installation-finalization-step.yml
         - import_tasks: tasks-openstack-core/12-insert-downloaded-linux-images-to-openstack.yml
         - import_tasks: tasks-configure-nova/02-create-nova-instance.yml
