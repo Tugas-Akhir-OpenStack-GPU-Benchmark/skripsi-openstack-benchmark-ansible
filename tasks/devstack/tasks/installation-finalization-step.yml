@@ -54,24 +54,45 @@
         {{ source_admin_openrc_cmd }} openstack project show -c id -f value "{{ OS_PROJECT_NAME }}"
       register: project_id
     - name: "get security-group ID"
-      shell: "{{ source_admin_openrc_cmd }} openstack security group list --project {{ project_id.stdout }} --format json"
-      register: security_group_ids
+      shell: "{{ source_admin_openrc_cmd }} openstack security group list --project {{ project_id.stdout }} --format json {{ os_password_flag }}"
+      register: security_group_id
     - set_fact:
-        security_group_ids: "{{ security_group_ids.stdout }}"
-        cacheable: yes  # not variable, it's an argument
+        security_group_id: "{{ security_group_id.stdout }}"
     - set_fact:
-        security_group_ids: "{{ security_group_ids | selectattr('Name', 'equalto', 'default')  }}"
-        cacheable: yes  # not variable, it's an argument
+        security_group_id: "{{ security_group_id | selectattr('Name', 'equalto', 'default')  }}"
     - set_fact:
-        security_group_ids: "{{ security_group_ids | map(attribute='ID')  }}"
-        cacheable: yes  # not variable, it's an argument
-
+        security_group_id: "{{ security_group_id | map(attribute='ID')  }}"
+    - set_fact:
+        security_group_id: "{{ security_group_id | first  }}"
     - debug:
-        var: security_group_ids
+        var: security_group_id
 
-    - loop: "{{ security_group_ids if (security_group_ids | type_debug) == 'list' else [] }}"
-      include_tasks: ./allow-icmp-tcp-udp-to-security-group.yml
+    - name: "Allow ICMP to openstack default security-group"
+      shell: "{{ source_admin_openrc_cmd }} openstack security group rule create --proto icmp {{ security_group_id }}"
+      register: rule_creation
+      failed_when: "rule_creation.rc != 0 and 'already exists' not in rule_creation.stderr"
+      changed_when: "'already exists' not in rule_creation.stderr"
+    - debug:
+        msg: "{{ rule_creation.rc }} -> {{ rule_creation.stderr }}"
+      when: "rule_creation.rc != 0"
 
+    - name: "Allow all TCP to openstack default security-group"
+      shell: "{{ source_admin_openrc_cmd }} openstack security group rule create --proto tcp --dst-port 1:65535 {{ security_group_id }} {{ os_password_flag }}"
+      register: rule_creation
+      failed_when: "rule_creation.rc != 0 and 'already exists' not in rule_creation.stderr"
+      changed_when: "'already exists' not in rule_creation.stderr"
+    - debug:
+        msg: "{{ rule_creation.rc }} -> {{ rule_creation.stderr }}"
+      when: "rule_creation.rc != 0"
+
+    - name: "Allow all UDP to openstack default security-group"
+      shell: "{{ source_admin_openrc_cmd }} openstack security group rule create --proto udp --dst-port 1:65535 {{ security_group_id }} {{ os_password_flag }}"
+      register: rule_creation
+      failed_when: "rule_creation.rc != 0 and 'already exists' not in rule_creation.stderr"
+      changed_when: "'already exists' not in rule_creation.stderr"
+    - debug:
+        msg: "{{ rule_creation.rc }} -> {{ rule_creation.stderr }}"
+      when: "rule_creation.rc != 0"
 
     - name: "Add 8.8.8.8 and 8.8.4.4 to OpenStack's DHCP server as the default DNS server"
       shell: "{{ source_admin_openrc_cmd }} openstack subnet set --dns-nameserver 8.8.8.8 --dns-nameserver 8.8.4.4 private-subnet"
@@ -93,8 +114,3 @@
     name:
       - net-tools
       - bridge-utils
-
-- name: "Increase MTU to enable SSH through Floating IP"
-  command: "sudo ifconfig {{ interface_1 }} mtu 1700"
-  become: true
-  become_user: root
