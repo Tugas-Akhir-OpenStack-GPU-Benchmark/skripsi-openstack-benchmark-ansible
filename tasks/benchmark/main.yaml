@@ -1,6 +1,6 @@
 # asia-northeast3-c
 - name: Main
-  hosts: id_ed25519
+  hosts: gcp
   become: True
   vars:
     base_path: /home/root

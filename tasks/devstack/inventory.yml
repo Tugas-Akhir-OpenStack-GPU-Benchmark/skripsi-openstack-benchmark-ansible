@@ -2,7 +2,9 @@ controller:
   hosts:
     controller-node:
       ansible_host: "{{ CONTROLLER_SSH_IP }}"
+      ansible_user: "{{ CONTROLLER_SSH_USER }}"
 compute:
   hosts:
     compute-node-1:
       ansible_host: "{{ COMPUTE_SSH_IP }}"
+      ansible_user: "{{ COMPUTE_SSH_USER }}"

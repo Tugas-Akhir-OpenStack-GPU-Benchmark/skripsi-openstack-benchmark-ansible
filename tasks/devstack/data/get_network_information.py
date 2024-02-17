@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import json
 import sys
 from pprint import pprint
 import netifaces
@@ -23,12 +24,12 @@ def main(assert_nic_exists: list[str]):
     for nic in assert_nic_exists:
         assert nic in nic_information
     default_gateway = get_default_gateway_linux()
-    pprint({
+    print(json.dumps({
         "gateway": default_gateway,
         "nic": nic_information,
         "interface_1": default_gateway['nic'],
         "interface_2": unpack_set(list_of_nic - {default_gateway['nic']}),
-    })
+    }))
 
 
 def startswith_any(string: str, *prefixes):

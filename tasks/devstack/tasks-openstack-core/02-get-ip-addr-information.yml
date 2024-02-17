@@ -22,7 +22,9 @@
   script: "../data/get_network_information.py"
   register: nic_information_json
 - set_fact:
-    nic_information_json: "{{ nic_information_json.stdout }}"
+    nic_information_json: "{{ nic_information_json.stdout | string | from_json }}"
+- debug:
+    var: nic_information_json
 - set_fact:
     interface_1: "{{ nic_information_json['interface_1'] }}"
 #    interface_2: "{{ nic_information_json['interface_2'] }}"
