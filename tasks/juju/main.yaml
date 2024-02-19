@@ -1,0 +1,27 @@
+# asia-northeast3-c
+- name: Main
+  hosts: all
+  become: True
+  vars:
+    base_path: /opt/stack
+    admin_password: "1122"
+    OS_PROJECT_NAME: "demo"  # I think it's the default automatically-created project by the devstack
+    parent_directory: "{{ inventory_dir | dirname }}"
+    ssh_key_destination_path: "/opt/stack/.ssh/id_ed25519"
+    force_reinstall: false
+
+    # Coba jalanin `ifconfig` di controller-node, dan cek Netmask dari physical interfacenya.
+    # Kalau netmasknya /32, isi field ini dengan subnet yang tidak intersect dengan subnet2 yang ada
+    # di komputer host (both compute maupun controller node)
+    # Dengan begitu nanti dari CONTROLLER node kita bisa ping ke floating IP (tp untuk saat ini msh blom bisa SSH)
+    devstack_floating_ip_range: "10.101.10.0/24"
+  tasks:
+    - debug:
+        msg: "python3 ./data/convert-all-crlf-to-lf.py \"{{parent_directory}}\""
+    - name: convert all ansible-related file to LF end-of-line
+      command: "python3 ./data/convert-all-crlf-to-lf.py \"{{parent_directory}}\" 2>&1"
+      delegate_to: "localhost"
+      register: result
+    - import_tasks: openstack-core/01-get-ip-addr-information.yml
+    - name: "Installing Maas"
+      import_tasks: openstack-core/02-install-maas.yml

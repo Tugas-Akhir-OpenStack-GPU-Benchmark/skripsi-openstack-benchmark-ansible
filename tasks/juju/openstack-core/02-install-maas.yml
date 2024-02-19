@@ -1,0 +1,24 @@
+- name: "Install Maas test-db"
+  command: "snap install maas-test-db"
+  become: true
+- name: "Install Maas"
+  command: "snap install maas --channel=3.3/stable"
+  become: true
+- name: "Maas init region+rack"
+  shell: >-
+    echo "{{'no' if not force_reinstall else 'yes'}}" 
+    | sudo maas init region+rack --maas-url http://{{ip_address_1}}:5240/MAAS --database-uri maas-test-db:///
+  register: init_result
+  changed_when: "'Controller has already been initialized' not in init_result.stdout"
+  become: true
+- debug:
+    var: init_result
+- name: "Create Maas admin user"
+  command: "maas createadmin --username admin --password {{admin_password}} --email admin@example.com --ssh-import \"lp:<unsername>\""
+  become: true
+  register: result
+  failed_when: "result.rc != 0 and 'already exists' not in result.stderr"
+  changed_when: "'already exists' not in result.stderr"
+- name: "export Maas api-key"
+  shell: "maas apikey --username admin > ~/admin-api-key"
+  become: true
