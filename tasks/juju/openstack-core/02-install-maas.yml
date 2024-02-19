@@ -14,11 +14,17 @@
 - debug:
     var: init_result
 - name: "Create Maas admin user"
-  command: "maas createadmin --username admin --password {{admin_password}} --email admin@example.com --ssh-import \"lp:<unsername>\""
+  command: "maas createadmin --username admin --password {{admin_password}} --email admin@example.com --ssh-import \"lp:{{ansible_user}}\""
   become: true
   register: result
   failed_when: "result.rc != 0 and 'already exists' not in result.stderr"
   changed_when: "'already exists' not in result.stderr"
 - name: "export Maas api-key"
-  shell: "maas apikey --username admin > ~/admin-api-key"
+  shell: >-
+    maas apikey --username admin > "{{base_path}}/admin-api-key"
   become: true
+- set_fact:
+    maas_login_command: " maas login admin http://localhost:5240/MAAS $(cat \"{{base_path}}/admin-api-key\") & "
+- name: "Setup MAAS DHCP"
+  shell: >-
+    {{maas_login_command}}  maas set-config name=upstream_dns value="8.8.8.8"

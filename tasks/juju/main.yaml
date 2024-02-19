@@ -3,12 +3,13 @@
   hosts: all
   become: True
   vars:
-    base_path: /opt/stack
+#    base_path: /opt/stack
     admin_password: "1122"
-    OS_PROJECT_NAME: "demo"  # I think it's the default automatically-created project by the devstack
     parent_directory: "{{ inventory_dir | dirname }}"
-    ssh_key_destination_path: "/opt/stack/.ssh/id_ed25519"
     force_reinstall: false
+#    OS_PROJECT_NAME: "demo"  # I think it's the default automatically-created project by the devstack
+#    ssh_key_destination_path: "/opt/stack/.ssh/id_ed25519"
+
 
     # Coba jalanin `ifconfig` di controller-node, dan cek Netmask dari physical interfacenya.
     # Kalau netmasknya /32, isi field ini dengan subnet yang tidak intersect dengan subnet2 yang ada
@@ -16,6 +17,11 @@
     # Dengan begitu nanti dari CONTROLLER node kita bisa ping ke floating IP (tp untuk saat ini msh blom bisa SSH)
     devstack_floating_ip_range: "10.101.10.0/24"
   tasks:
+    - command: "pwd"
+      become: false
+      register: base_path
+    - set_fact:
+        base_path: "{{ base_path.stdout }}"
     - debug:
         msg: "python3 ./data/convert-all-crlf-to-lf.py \"{{parent_directory}}\""
     - name: convert all ansible-related file to LF end-of-line
