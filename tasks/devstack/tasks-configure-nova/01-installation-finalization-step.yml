@@ -47,8 +47,6 @@
     # by https://github.com/reachsrirams/openstack-scripts/issues/28
     - name: "nova-manage cell_v2 discover_hosts"
       shell: "{{ source_admin_openrc_cmd }} nova-manage cell_v2 discover_hosts --verbose"
-#    - debug:
-#        msg: "{{ source_admin_openrc_cmd }} openstack security group list --project 1ec5bc8e6e2e4e059ad8bf70c3290f6c --format json"
     - name: "get project-ID"
       shell: >-
         {{ source_admin_openrc_cmd }} openstack project show -c id -f value "{{ OS_PROJECT_NAME }}"

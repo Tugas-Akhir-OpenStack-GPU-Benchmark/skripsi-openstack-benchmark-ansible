@@ -1,3 +1,8 @@
+
+
+gcloud compute images create nested-vm-ubuntu-2204 --source-image=projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20240126 --licenses="https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx"
+
+
 INSTANCE_ID=$RANDOM
 
 # GPU
@@ -13,11 +18,12 @@ gcloud compute instances create belgium-$INSTANCE_ID-gpu-1 \
     --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
     --accelerator=count=1,type=nvidia-tesla-t4 \
     --tags=http-server,https-server,lb-health-check \
-    --create-disk=auto-delete=yes,boot=yes,device-name=belgium-$INSTANCE_ID-gpu-1-gpu,image=projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20240126,mode=rw,size=140,type=projects/law-2006463162/zones/europe-west1-d/diskTypes/pd-balanced \
+    --create-disk=auto-delete=yes,boot=yes,device-name=belgium-$INSTANCE_ID-gpu-1-gpu,image=nested-vm-ubuntu-2204,mode=rw,size=140,type=projects/law-2006463162/zones/europe-west1-d/diskTypes/pd-balanced \
     --no-shielded-secure-boot \
     --shielded-vtpm \
     --shielded-integrity-monitoring \
     --labels=goog-ec-src=vm_add-gcloud \
+    --enable-nested-virtualization \
     --reservation-affinity=any &
 
 

@@ -15,7 +15,7 @@
   register: devstack_already_cloned
   failed_when: false
 - name: "git clone devstack"
-  command: "git clone https://opendev.org/openstack/devstack ~/devstack --depth=1"
+  command: "git clone -b stable/2023.2 --single-branch https://opendev.org/openstack/devstack ~/devstack --depth=1"
   when: "devstack_already_cloned.rc != 0"
 - name: replace GIT_DEPTH=0 to GIT_DEPTH=1 inside stack.sh to increase performance
   replace:

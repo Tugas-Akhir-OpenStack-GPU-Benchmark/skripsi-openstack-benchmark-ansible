@@ -1,0 +1,45 @@
+# Additional notes: https://wiki.archlinux.org/title/PCI_passthrough_via_OVMF
+# Need CPUs that allow PCIE pass-through
+
+#- name: "Check if QEMU-KVM is supported"
+#  command: "/usr/bin/qemu-system-x86_64 --version"
+#  register: result
+#  failed_when: "result.rc != 0 or 'QEMU emulator version' not in result.stdout"
+#  changed_when: false
+
+- when: is_compute
+  become_user: root
+  block:
+    - name: "Install cpu-checker"
+      become: true
+      apt:
+        name:
+          - cpu-checker
+    - name: "Check if KVM is enabled"
+      become: true
+      command: "kvm-ok"
+      register: is_kvm_enabled
+    - fail:
+        msg: "Please enable KVM on your compute node"
+      when: "'KVM acceleration can be used' not in is_kvm_enabled.stdout"
+    - name: "Install Libvirt"
+      become: true
+      apt:
+        name:
+          - qemu-kvm
+          - libvirt-daemon-system
+    - name: "Add current user to the libvirt group"
+      become: true
+      command: "adduser stack libvirt"
+      register: result
+      changed_when: "'is already a member of' not in result.stdout"
+    - name: "Perform ansible SSH logout and relogin"
+      meta: reset_connection
+    - name: "Check if Libvirt successfully installed"
+      become: true
+      shell: >-
+        virsh net-list | grep "^[[:space:]]*default[[:space:]]*active[[:space:]]*yes[[:space:]]*yes"
+      register: libvirt_installed
+    - fail:
+        msg: "Libvirt did not installed successfully"
+      when: "libvirt_installed.stdout | length == 0"

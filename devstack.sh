@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export ANSIBLE_SSH_RETRIES=8
 
 if [ $# -lt 2 ]
 then
@@ -24,24 +25,28 @@ echo "num of jumphosts: $argument_length"
 
 # if more than 1 arguments specified
 if (( $argument_length > 0 )); then
-    ssh_jumphosts="-A -J $ssh_jumphosts"
+    ssh_jumphosts="-o ConnectTimeout=250 -A -J $ssh_jumphosts"
     echo "jumphost detected"
 fi
 
-echo "ssh_jumphosts: $ssh_jumphosts"
+echo "ssh args: $ssh_jumphosts"
 
 
 if [[ $ssh_target_controller_node != *@* ]]; then
-    echo "Error: Please specify the arguments as USERNAME@DESTINATION_IP"
-    exit 1
+    ssh_target_controller_node_username=immanuel01
+    ssh_target_controller_node_ip="$ssh_target_controller_node"
+else
+    IFS='@' read -r ssh_target_controller_node_username ssh_target_controller_node_ip <<< "$ssh_target_controller_node";
 fi
 if [[ $ssh_target_compute_node != *@* ]]; then
-    echo "Error: Please specify the arguments as USERNAME@DESTINATION_IP"
-    exit 1
+    ssh_target_compute_node_username=immanuel01
+    ssh_target_compute_node_ip="$ssh_target_compute_node"
+else
+    IFS='@' read -r ssh_target_compute_node_username ssh_target_compute_node_ip <<< "$ssh_target_compute_node";
 fi
 
-IFS='@' read -r ssh_target_controller_node_username ssh_target_controller_node_ip <<< "$ssh_target_controller_node"
-IFS='@' read -r ssh_target_compute_node_username ssh_target_compute_node_ip <<< "$ssh_target_compute_node"
+
+
 
 # Assumption appropriate ssh-key already exists (on the computer which run this ansible script)
 # and already set as default (can be configured inside the ~/.ssh/config)

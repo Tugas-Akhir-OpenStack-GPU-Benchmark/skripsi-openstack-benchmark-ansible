@@ -1,0 +1,28 @@
+- when: is_compute
+  block:
+    - name: "Check if iommu already enabled"
+      become: true
+      ignore_errors: "{{ ignore_iommu_not_detected_error }}"
+      shell: >-
+        cat /proc/cmdline | grep iommu
+      register: iommu_enabled
+    - name: "Check if iommu already enabled (2)"
+      become: true
+      ignore_errors: "{{ ignore_iommu_not_detected_error }}"
+      shell: >-
+        virt-host-validate | grep "iommu.*PASS" -i
+      register: iommu_enabled_2
+    - set_fact:
+        iommu_enabled: "{{ iommu_enabled.stdout | length == 0 }}"
+        iommu_enabled_2: "{{ iommu_enabled_2.stdout | length == 0 }}"
+    - debug:
+        var: ignore_iommu_not_detected_error
+    - debug:
+        var: iommu_enabled
+    - debug:
+        var: iommu_enabled_2
+    - fail:
+        msg: "Please enable iommu by append either intel_iommu=on or amd_iommu=on to the GRUB_CMDLINE_LINUX_DEFAULT in /etc/default/grub"
+      when: "iommu_enabled and iommu_enabled_2 and not ignore_iommu_not_detected_error"
+
+# sudo nano /etc/nova/nova.conf

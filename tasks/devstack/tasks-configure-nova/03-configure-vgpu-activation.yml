@@ -1,0 +1,128 @@
+# Reference: https://www.youtube.com/watch?v=cPrOoeMxzu0&ab_channel=CraftComputing
+
+- when: is_compute
+  name: "configure vgpu activation"
+  block:
+    - set_fact:
+        git_clone_directory: "/opt/stack/git"
+    - name: "make sure directory exists"
+      file:
+        path: "{{ git_clone_directory }}"
+        state: directory
+        recurse: yes
+    - set_fact:
+        vgpu_clone_directory: "\"{{git_clone_directory}}/vgpu_unlock\""
+    - name: "Clone vgpu unlocker"
+      command: "git clone https://github.com/DualCoder/vgpu_unlock.git {{vgpu_clone_directory}}"
+    - name: "Set vgpu_unlocker as executable"
+      command: "chmod -R +x {{vgpu_clone_directory}}"
+    - name: "Install mdevctl"
+      apt:
+        update_cache: yes
+        name:
+          - mdevctl
+    - name: "Check if IOMMU is on"
+      shell: >-
+        sudo grep -o '^[^#]*' /etc/default/grub | grep GRUB_CMDLINE_LINUX_DEFAULT | grep "(intel|amd)_iommu=on" -P
+      register: iommu_is_on
+    - name: "Check if IOMMU pass-through is on"
+      shell: >-
+        sudo grep -o '^[^#]*' /etc/default/grub | grep GRUB_CMDLINE_LINUX_DEFAULT | grep "iommu=pt"
+      register: iommu_pt_configured
+    - fail:
+        msg: >-
+          Please add intel_iommu=on or amd_iommu=on to GRUB_CMDLINE_LINUX_DEFAULT variable inside /etc/default/grub 
+          and then run sudo update-grub
+      when: "iommu_is_on.stdout | length == 0"
+    - fail:
+        msg: >-
+          Please add iommu=pt to GRUB_CMDLINE_LINUX_DEFAULT variable inside /etc/default/grub 
+          and then run sudo update-grub
+      when: "iommu_pt_configured.stdout | length == 0"
+    - name: "Add vfio to /etc/modules"
+      lineinfile:
+        dest: /etc/modules
+        line: "vfio"
+        regexp: "^vfio$"
+        state: present
+        insertafter: EOF
+        create: True
+    - name: "Add vfio_iommu_type1 to /etc/modules"
+      lineinfile:
+        dest: /etc/modules
+        line: "vfio_iommu_type1"
+        regexp: "^vfio_iommu_type1$"
+        state: present
+        insertafter: EOF
+        create: True
+    - name: "Add vfio_pci to /etc/modules"
+      lineinfile:
+        dest: /etc/modules
+        line: "vfio_pci"
+        regexp: "^vfio_pci$"
+        state: present
+        insertafter: EOF
+        create: True
+    - name: "Add vfio_virqfd to /etc/modules"
+      lineinfile:
+        dest: /etc/modules
+        line: "vfio_virqfd"
+        regexp: "^vfio_virqfd$"
+        state: present
+        insertafter: EOF
+        create: True
+
+
+    - name: "vfio_iommu_type1 allow_unsafe_interrupts to /etc/modprobe.d/openstack_*"
+      lineinfile:
+        dest: /etc/modprobe.d/openstack_iommu_unsafe_interrupts.conf
+        line: "options vfio_iommu_type1 allow_unsafe_interrupts=1"
+        regexp: "^options vfio_iommu_type1 allow_unsafe_interrupts=1$"
+        state: present
+        insertafter: EOF
+        create: True
+      register: modprob_changed_1
+    - name: "options kvm ignore_msrs to /etc/modprobe.d/openstack_*"
+      lineinfile:
+        dest: /etc/modprobe.d/openstack_kvm.conf
+        line: "options kvm ignore_msrs=1"
+        regexp: "^options kvm ignore_msrs=1$"
+        state: present
+        insertafter: EOF
+        create: True
+      register: modprob_changed_2
+    - name: "blacklist nouveau to /etc/modprobe.d/openstack_*"
+      lineinfile:
+        dest: /etc/modprobe.d/openstack_blacklist_nouveau.conf
+        line: "blacklist nouveau"
+        regexp: "^blacklist nouveau$"
+        state: present
+        insertafter: EOF
+        create: True
+      register: modprob_changed_3
+    - name: "update-initramfs -u"
+      command: "update-initramfs -u"
+      when: "modprob_changed_1.changed | modprob_changed_2.changed | modprob_changed_3.changed"
+    - name: "reboot"
+      reboot:
+        reboot_timeout: 600
+      when: "modprob_changed_1.changed | modprob_changed_2.changed | modprob_changed_3.changed"
+
+    - name: "Check IOMMU is running"
+      shell: >-
+        sudo dmesg | grep -e DMAR -e IOMMU
+      register: iommu_running
+    - name: "Check if IOMMU error"
+      shell: >-
+        sudo dmesg | grep -e DMAR -e IOMMU | grep "error|fail" -P -i
+      register: iommu_error
+    - fail:
+        msg: "IOMMU is not running. Either you haven't configured the Grub conf properly or your machine doesn't support it"
+      when: "iommu_running.stdout | length == 0"
+    - fail:
+        msg: "IOMMU is error. Please check it by running `sudo dmesg | grep -e DMAR -e IOMMU`"
+      when: "iommu_error.stdout | length > 0"
+
+
+# To be continued
+# Next: install nvidia vGPU driver (which need to buy a license)
