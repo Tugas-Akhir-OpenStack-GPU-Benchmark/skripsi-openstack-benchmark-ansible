@@ -5,7 +5,7 @@
   vars:
     base_path: /opt/stack
     admin_password: "1122"
-    OS_PROJECT_NAME: "demo"  # I think it's the default automatically-created project by the devstack
+    OS_PROJECT_NAME: "demo"  # it's the default automatically-created project by the devstack
     parent_directory: "{{ inventory_dir | dirname }}"
     ssh_key_destination_path: "/opt/stack/.ssh/id_ed25519"
     force_reinstall: false

@@ -9,8 +9,3 @@
         src: "../data/{{ node_type }}-local.sh"
         dest: ~/devstack/local.sh
         mode: "0777"
-- name: copy create_instance.py to server
-  template:
-    src: "../data/create_instance.py"
-    dest: ~/create_instance.py
-    mode: "0777"
