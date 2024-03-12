@@ -90,7 +90,7 @@ sudo systemctl restart devstack@c-sch.service
 
 ## 6. register new openstack flavor
 ```
-openstack flavor create --ram 2048 --disk 20 --vcpu 1 gpuflavor
+openstack flavor create --ram 2048 --disk 30 --vcpu 2 gpuflavor
 openstack flavor set gpuflavor --property "pci_passthrough:alias"="T4:1"
 ```
 
@@ -101,11 +101,13 @@ sudo reboot`
 
 ## 7. Create the instance
 ```
-openstack server create --flavor gpuflavor --image Ubuntu2004 --nic net-id=1951cbe2-280d-46c1-a145-eefe11f01f71 --security-group bfd936f3-99b5-4c05-85ff-ca9843ef7c99 --key-name created_by_ansible gpu_real
+openstack server create --flavor gpuflavor --image Ubuntu2004 --nic net-id=9648854b-eb41-4734-99a3-988950cd2f7a --security-group 5d58e239-143a-49fa-bbb4-a4cd7620f652 --key-name created_by_ansible gpu_real
 ```
 
 
 Di adopsi dari:
-- https://gist.github.com/claudiok/890ab6dfe76fa45b30081e58038a9215
+- https://www.reddit.com/r/openstack/comments/16g7lmj/comment/k0ilv2c/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button  (ngasih tau kalo openstack nova punya 2 file conf yang berbeda: /etc/nova/nova.conf vs /etc/nova/nova-compute.conf (dalam hal devstack, ini: /etc/nova/nova-cpu.conf) 
+- https://gist.github.com/claudiok/890ab6dfe76fa45b30081e58038a9215 (ngasih tutorial untuk enable vfio-pci)
+- https://mathiashueber.com/pci-passthrough-ubuntu-2004-virtual-machine/ (ngajarin kalau semua member dari IOMMU Group yang mau di-passthrough harus ditambahin ke vfio, serta cara ngecek IOMMU groupnya)
 - https://documentation.suse.com/soc/9/html/suse-openstack-cloud-crowbar-all/gpu-passthrough.html
 - https://docs.openstack.org/nova/latest/admin/pci-passthrough.html
