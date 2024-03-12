@@ -11,6 +11,11 @@
     force_reinstall: false
     ignore_iommu_not_detected_error: false  # please set this to true **only** in development environment
 
+    gpu_pci_vendor_id: "10de"  # see from   lspci -nn | grep nvidia -i
+    gpu_pci_product_id: "1eb8"
+    gpu_device_type: "type-PF"  # type-PF if SR-IOV enabled, or type-PCI if SR-IOV not enabled or not available
+    gpu_pci_openstack_alias_name: "T4"
+
 
     # Coba jalanin `ifconfig` di controller-node, dan cek Netmask dari physical interfacenya.
     # Kalau netmasknya /32, isi field ini dengan subnet yang tidak intersect dengan subnet2 yang ada

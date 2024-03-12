@@ -6,6 +6,24 @@
 - name: finalization
   when: is_controller
   block:
+    - name: copy create_instance.py to server
+      template:
+        src: "../data/create_instance.py"
+        dest: "{{base_path}}/create_nova_instance.py"
+        mode: "0777"
+    - name: copy add-pci-to-nova-conf.py to server
+      copy:
+        src: "../data/add-pci-to-nova-conf.py"
+        dest: "{{base_path}}/add-pci-to-nova-conf.py"
+        mode: "0777"
+    - name: "run python script to configure nova GPU PCI Passthrough nova.conf"
+      command: >-
+        {{base_path}}/add-pci-to-nova-conf.py {{gpu_pci_vendor_id}} {{gpu_pci_product_id}} {{gpu_device_type}} 
+        {{gpu_pci_openstack_alias_name}} "/etc/nova/nova.conf" {{node_type}}
+    - name: "run python script to configure nova GPU PCI Passthrough nova.conf"
+      command: >-
+        {{base_path}}/add-pci-to-nova-conf.py {{gpu_pci_vendor_id}} {{gpu_pci_product_id}} {{gpu_device_type}} 
+        {{gpu_pci_openstack_alias_name}} "/etc/nova/nova-cpu.conf" {{node_type}}
     - set_fact:
         admin_password_cmd_arg: "\"{{ admin_password }}\""
     - set_fact:

@@ -8,7 +8,7 @@ import json
 from time import sleep
 
 FLAVOR_NAME = "gpuflavor"
-PCI_ALIAS = "T4"
+PCI_ALIAS = "{{gpu_pci_openstack_alias_name}}"
 
 def main():
     source_bash_script("/opt/stack/admin-openrc.sh")
