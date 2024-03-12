@@ -24,6 +24,11 @@
       command: >-
         {{base_path}}/add-pci-to-nova-conf.py {{gpu_pci_vendor_id}} {{gpu_pci_product_id}} {{gpu_device_type}} 
         {{gpu_pci_openstack_alias_name}} "/etc/nova/nova-cpu.conf" {{node_type}}
+    - name: Restart all devstack services
+      become: yes
+      systemd:
+        name: "devstack@*"
+        state: restarted
     - set_fact:
         admin_password_cmd_arg: "\"{{ admin_password }}\""
     - set_fact:
