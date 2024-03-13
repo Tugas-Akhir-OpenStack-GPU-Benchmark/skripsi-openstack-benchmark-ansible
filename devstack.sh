@@ -62,7 +62,7 @@ if [ -n "$SUDO_PASS" ]; then
   ANSIBLE_EXTRAVARS="$ANSIBLE_EXTRAVARS ansible_sudo_pass=\"$SUDO_PASS\""
   echo "detected SUDO_PASS. Will use it for sudo authentication"
 else
-  echo "var SUDO_PASS is not set. Will assume target hosts no need password to run sudo commands..."
+  echo "var SUDO_PASS is not set. Will assume target hosts don't need password to run sudo commands..."
 fi
 
 
