@@ -21,8 +21,13 @@
   check_mode: yes
   register: presence2
   when: "devstack_logfile_exists"
+- name: Check if devstack already installed successfully based on systemctl
+  shell: >-
+    systemctl --state=running | grep devstack@ | wc -l
+  register: systemctl_grep_line_count
 - set_fact:  # set true iif (log-file exists and those lines exists)
     devstack_already_installed_successfully: >-
-      {{ devstack_logfile_exists and (not presence.changed) and (not presence2.changed) and not force_reinstall }}
+      {{ devstack_logfile_exists and (not presence.changed) and (not presence2.changed) and (systemctl_grep_line_count.stdout != "0") 
+      and not force_reinstall }}
 - debug:
     var: devstack_already_installed_successfully
