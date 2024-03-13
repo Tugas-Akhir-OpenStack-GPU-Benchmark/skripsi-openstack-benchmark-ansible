@@ -1,5 +1,7 @@
 # Reference: https://www.youtube.com/watch?v=cPrOoeMxzu0&ab_channel=CraftComputing
 
+# DISCONTINUED, develompent of this script is stopped because vGPU requires us to buy NVIDIA vGPU license
+
 - when: is_compute
   name: "configure vgpu activation"
   block:
@@ -123,6 +125,3 @@
         msg: "IOMMU is error. Please check it by running `sudo dmesg | grep -e DMAR -e IOMMU`"
       when: "iommu_error.stdout | length > 0"
 
-
-# To be continued
-# Next: install nvidia vGPU driver (which need to buy a license)

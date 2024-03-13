@@ -1,0 +1,14 @@
+- when: is_controller
+  block:
+    - set_fact:
+        nova_instance_name: "gpu-benchmark"
+    - name: copy create_instance.py to server (create_nova_instance.py)
+      template:
+        src: "../data/create_instance.py"
+        dest: "{{base_path}}/create_nova_instance.py"
+        mode: "0777"
+    - name: running create_nova_instance.py
+      command: "{{base_path}}/create_nova_instance.py \"{{admin_password}}\""
+      register: create_nova_instance_result
+    - debug:
+        var: create_nova_instance_result.stdout

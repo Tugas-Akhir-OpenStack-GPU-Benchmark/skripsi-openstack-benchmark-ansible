@@ -1,5 +1,10 @@
 - when: is_compute
   block:
+    - set_fact:
+        gpu_pci_vendor_and_product_id: "{{gpu_pci_vendor_id}}:{{gpu_pci_product_id}}"
+    - name: "Make sure that GPU PCI is being used by vfio-pci"
+      script: "../data/check-pci-are-in-use-by-vfio-pci.py \"{{gpu_pci_vendor_and_product_id}}\""
+
     - name: "Check if iommu already enabled"
       become: true
       ignore_errors: "{{ ignore_iommu_not_detected_error }}"
@@ -24,5 +29,12 @@
     - fail:
         msg: "Please enable iommu by append either intel_iommu=on or amd_iommu=on to the GRUB_CMDLINE_LINUX_DEFAULT in /etc/default/grub"
       when: "iommu_enabled and iommu_enabled_2 and not ignore_iommu_not_detected_error"
+
+    - name: "Check if target PCI is in-use by"
+      become: true
+      ignore_errors: "{{ ignore_iommu_not_detected_error }}"
+      shell: >-
+        virt-host-validate | grep "iommu.*PASS" -i
+      register: iommu_enabled_2
 
 # sudo nano /etc/nova/nova.conf

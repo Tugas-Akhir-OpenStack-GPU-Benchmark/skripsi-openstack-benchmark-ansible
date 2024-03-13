@@ -57,30 +57,6 @@
           shell: >-
             {{ source_admin_openrc_cmd }} 
             openstack floating ip create {{public_network_id}}
-    #        - name: "Get IP address of a new floating-ip"
-    #          script:
-    #            cmd: "../data/ip_calculator.py {{devstack_floating_ip_range}} 3"
-    #          register: new_floating_ip_address
-    #        - name: "Get IP address of a new floating-ip 2"
-    #          script:
-    #            cmd: "../data/ip_calculator.py {{devstack_floating_ip_range}} 4"
-    #          register: new_floating_ip_address_2
-    #        - set_fact:
-    #            new_floating_ip_address: "{{ new_floating_ip_address.stdout | from_json }}"
-    #            new_floating_ip_address_2: "{{ new_floating_ip_address_2.stdout | from_json }}"
-    #        - fail:
-    #            msg: "Subnet too small: devstack_floating_ip_range {{devstack_floating_ip_range}}. Please set it with size of 8"
-    #          when: "new_floating_ip_address['different_subnet'] or new_floating_ip_address_2['different_subnet']"
-    #        - set_fact:
-    #            new_floating_ip_address: "{{ new_floating_ip_address['resulting_ip'] }}"
-    #            new_floating_ip_address_2: "{{ new_floating_ip_address_2['resulting_ip'] }}"
-    #        - name: "Create a new floating ip"
-    #          shell: >-
-    #            {{ source_admin_openrc_cmd }}
-    #            openstack floating ip create {{public_network_id}} --floating-ip-address {{new_floating_ip_address}}
-    #          register: result
-    #          changed_when: "'already allocated' not in result.stderr"
-    #          failed_when: "result.rc !=0 and 'already allocated' not in result.stderr"
 
     - name: "Get information about existing floating IP"
       shell: >-

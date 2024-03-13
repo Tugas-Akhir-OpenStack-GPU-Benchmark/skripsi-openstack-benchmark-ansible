@@ -54,5 +54,6 @@
             - import_tasks: tasks-configure-nova/01-installation-finalization-step.yml
             - import_tasks: tasks-openstack-core/12-insert-downloaded-linux-images-to-openstack.yml
             - import_tasks: tasks-configure-nova/02-check-kvm-libvirt-support.yml
-            - import_tasks: tasks-configure-nova/10-create-nova-instance.yml
+            - import_tasks: tasks-configure-nova/03-check-if-gpu-passthrough-requirements-passed.yml
+            - import_tasks: tasks-configure-nova/04-create-nova-instance.yml
 

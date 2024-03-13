@@ -5,11 +5,7 @@
     mode: 0777
 - name: "pip3 install configupdater 3.2"
   command: "pip3 install configupdater==3.2"
-- name: copy create_instance.py to server
-  template:
-    src: "../data/create_instance.py"
-    dest: "{{base_path}}/create_nova_instance.py"
-    mode: "0777"
+
 - name: copy add-pci-to-nova-conf.py to server
   copy:
     src: "../data/add-pci-to-nova-conf.py"
