@@ -37,6 +37,7 @@ class Main:
         # backup
         if len(self.changes) == 0:
             return
+        print("modified")
         with open(get_backup_file_name(self.filename), 'w') as f:
             self.updater.write(f)
         self.apply_changes(self.updater)
