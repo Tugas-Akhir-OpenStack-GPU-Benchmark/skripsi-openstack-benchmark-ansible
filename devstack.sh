@@ -48,7 +48,7 @@ fi
 
 
 
-# Assumption appropriate ssh-key already exists (on the computer which run this ansible script)
+# It's assumed that appropriate ssh-key already exists (on the computer which run this ansible script)
 # and already set as default (can be configured inside the ~/.ssh/config)
 
 export ANSIBLE_EXTRAVARS=""
@@ -68,4 +68,4 @@ fi
 
 export ANSIBLE_CACHE_PLUGIN=jsonfile
 
-sudo ansible-playbook ./tasks/devstack/main.yaml -i ./tasks/devstack/inventory.yml -e "$ANSIBLE_EXTRAVARS"
+ansible-playbook ./tasks/devstack/main.yaml -i ./tasks/devstack/inventory.yml -e "$ANSIBLE_EXTRAVARS"
