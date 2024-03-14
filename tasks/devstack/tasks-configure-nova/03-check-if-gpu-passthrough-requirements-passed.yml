@@ -1,4 +1,4 @@
-- when: is_compute
+- when: "is_compute and configure_and_create_gpu_instances"
   block:
     - set_fact:
         gpu_pci_vendor_and_product_id: "{{gpu_pci_vendor_id}}:{{gpu_pci_product_id}}"

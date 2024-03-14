@@ -11,6 +11,8 @@
     force_reinstall: false
     ignore_iommu_not_detected_error: false  # please set this to true **only** in development environment
 
+    configure_and_create_gpu_instances: false
+
     gpu_pci_vendor_id: "10de"  # see from   lspci -nn | grep nvidia -i
     gpu_pci_product_id: "1eb8"
     gpu_device_type: "type-PF"  # type-PF if SR-IOV enabled, or type-PCI if SR-IOV not enabled or not available

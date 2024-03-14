@@ -10,8 +10,10 @@
     - name: running create_nova_instance.py to create GPU nova instance
       command: "{{base_path}}/create_nova_instance.py \"{{admin_password}}\" gpu"
       register: create_nova_instance_result
+      when: configure_and_create_gpu_instances
     - debug:
         var: create_nova_instance_result.stdout
+      when: configure_and_create_gpu_instances
     - name: running create_nova_instance.py to create ansible nova instance
       command: "{{base_path}}/create_nova_instance.py \"{{admin_password}}\" ansible"
       register: create_nova_instance_result
