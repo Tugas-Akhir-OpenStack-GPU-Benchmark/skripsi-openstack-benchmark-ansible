@@ -8,7 +8,8 @@ import json
 import sys
 from time import sleep
 
-INSTANCE_NAME = "gpu-benchmark"
+GPU_INSTANCE_NAME = "gpu-benchmark"
+ANSIBLE_INSTANCE_NAME = "ansible"
 FLAVOR_NAME = "gpuflavor"
 PCI_ALIAS = "{{gpu_pci_openstack_alias_name}}"
 
@@ -16,10 +17,20 @@ PCI_ALIAS = "{{gpu_pci_openstack_alias_name}}"
 def main():
     source_bash_script("/opt/stack/admin-openrc.sh")
     os.environ["OS_PASSWORD"] = sys.argv[1]
-    delete_all_current_instance_with_gpuflavor()
+    if sys.argv[2] == "gpu":
+        create_gpu_instance()
+    elif sys.argv[2] == "ansible":
+        create_ansible_instance()
+    else:
+        raise Exception(f"Command not found: {sys.argv[2]}")
+
+
+
+def create_gpu_instance():
+    delete_all_current_instance_with_given_criteria(flavor_name=FLAVOR_NAME, instance_name=GPU_INSTANCE_NAME)
     delete_gpuflavor_if_exists()
     create_gpuflavor()
-    instance_id = create_instance(INSTANCE_NAME)
+    instance_id = create_instance(GPU_INSTANCE_NAME)
     instance_status = show_instance_status(instance_id)
     print(instance_status[0])
     print(instance_status[1])
@@ -27,17 +38,39 @@ def main():
         print("Stopped due to error...")
         exit(1)
     floating_ip = attach_to_a_floating_ip(instance_id)
-    print(f"instance {instance_id} created with floating IP: {floating_ip}")
+    print(f"GPU instance {instance_id} created with floating IP: {floating_ip}")
 
 
+def create_ansible_instance():
+    instances = get_all_current_instance_with_given_criteria(instance_name=ANSIBLE_INSTANCE_NAME)
+    if len(instances) > 0:
+        print(f"ALREADY EXIST: Ansible instance {instances[0]['ID']}")
+        return
+    instance_id = create_instance(ANSIBLE_INSTANCE_NAME, "m1.small", allow_error=True)  # allow error if duplicate already exists
+    if isinstance(instance_id, Error):
+        print(instance_id.msg)
+    floating_ip = attach_to_a_floating_ip(instance_id)
+    print(f"Ansible instance {instance_id} created with floating IP: {floating_ip}")
 
-def delete_all_current_instance_with_gpuflavor():
+
+def delete_all_current_instance_with_given_criteria(flavor_name=None, instance_name=None):
     output = run_command("openstack server list --format=json", True)
     for instance in output:
-        if instance['Flavor'] == FLAVOR_NAME:
+        if instance['Flavor'] == flavor_name or instance['Name'] == instance_name:
             name = instance['Name']
-            print(f"Deleting {name}")
-            run_command(f"openstack server delete \"{name}\"")
+            instance_id = instance['ID']
+            print(f"Deleting {name}: {instance_id}")
+            run_command(f"openstack server delete \"{instance_id}\"")
+
+
+def get_all_current_instance_with_given_criteria(flavor_name=None, instance_name=None):
+    ret = []
+    output = run_command("openstack server list --format=json", True)
+    for instance in output:
+        if instance['Flavor'] == flavor_name or instance['Name'] == instance_name:
+            ret.append(instance)
+    return ret
+
 
 def delete_gpuflavor_if_exists():
     if get_gpuflavor_id_if_exists() is None:
@@ -61,8 +94,11 @@ def create_gpuflavor():
     #run_command(f'openstack flavor set --property hw:numa_nodes=1 --property hw:numa_cpus.0=0,1 --property hw:numa_mem.0=2048 "{FLAVOR_NAME}"')
 
 
-def create_instance(instance_name):
-    output = run_command(f'openstack server create --flavor {FLAVOR_NAME} --image Ubuntu2004 --nic net-id={get_private_network_id()} --security-group {get_security_group_id("demo")} --key-name created_by_ansible "{instance_name}" --format=json', True)
+def create_instance(instance_name, flavor=FLAVOR_NAME, allow_error=False):
+    output = run_command(f'openstack server create --flavor {flavor} --image Ubuntu2004 --nic net-id={get_private_network_id()} --security-group {get_security_group_id("demo")} --key-name created_by_ansible "{instance_name}" --format=json',
+                         True, allow_error=allow_error)
+    if isinstance(output, Error):
+        return output
     return output['id']
 
 
@@ -92,11 +128,13 @@ def get_network_id(name):
 
 
 def show_instance_status(instance_id):
-    while True:
+    for i in range(200):
         output = run_command(f"openstack server show {instance_id} --format=json", True)
         if output['status'] in ('ERROR', 'ACTIVE'):
             break
         sleep(0.1)
+    else:
+        raise Exception(f"Timed out waiting instance status to be ACTIVE/ERROR. Stuck state: {output['status']}")
     return output['status'], output.get('fault', "-")
 
 

@@ -2,13 +2,18 @@
   block:
     - set_fact:
         nova_instance_name: "gpu-benchmark"
-    - name: copy create_instance.py to server (create_nova_instance.py)
+    - name: copy create_nova_instance.py to server (create_nova_instance.py)
       template:
-        src: "../data/create_instance.py"
+        src: "../data/create_nova_instance.py"
         dest: "{{base_path}}/create_nova_instance.py"
         mode: "0777"
-    - name: running create_nova_instance.py
-      command: "{{base_path}}/create_nova_instance.py \"{{admin_password}}\""
+    - name: running create_nova_instance.py to create GPU nova instance
+      command: "{{base_path}}/create_nova_instance.py \"{{admin_password}}\" gpu"
+      register: create_nova_instance_result
+    - debug:
+        var: create_nova_instance_result.stdout
+    - name: running create_nova_instance.py to create ansible nova instance
+      command: "{{base_path}}/create_nova_instance.py \"{{admin_password}}\" ansible"
       register: create_nova_instance_result
     - debug:
         var: create_nova_instance_result.stdout
