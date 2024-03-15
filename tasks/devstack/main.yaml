@@ -56,4 +56,5 @@
             - import_tasks: tasks-configure-nova/02-check-kvm-libvirt-support.yml
             - import_tasks: tasks-configure-nova/03-check-if-gpu-passthrough-requirements-passed.yml
             - import_tasks: tasks-configure-nova/04-create-nova-instance.yml
+            - import_tasks: tasks-configure-zun/01-create-zun-container.yml
 
