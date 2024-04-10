@@ -6,7 +6,7 @@ import netifaces
 import psutil
 
 
-def main(assert_nic_exists: list[str]):
+def main(assert_nic_exists: list):
     nic_information = psutil.net_if_addrs()
 
     nic_information = {

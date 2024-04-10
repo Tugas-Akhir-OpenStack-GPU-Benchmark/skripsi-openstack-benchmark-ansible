@@ -54,7 +54,7 @@ def main():
     print_log(target_services, last_n_minutes, display_mode)
 
 
-def print_log(target_services: list[str], last_n_minutes=10, display_mode="separated"):
+def print_log(target_services: list, last_n_minutes=10, display_mode="separated"):
     if display_mode == "separated":
         return print_log_separated(target_services, last_n_minutes)
     if display_mode == "combined":
@@ -62,7 +62,7 @@ def print_log(target_services: list[str], last_n_minutes=10, display_mode="separ
     raise ValueError(f"Invalid display mode: {display_mode}")
 
 
-def print_log_separated(target_services: list[str], last_n_minutes):
+def print_log_separated(target_services: list, last_n_minutes):
     for target_service in target_services:
         print()
         print()
@@ -71,11 +71,11 @@ def print_log_separated(target_services: list[str], last_n_minutes):
         print(get_log_combined([target_service], last_n_minutes=last_n_minutes))
 
 
-def print_log_combined(target_services: list[str], last_n_minutes):
+def print_log_combined(target_services: list, last_n_minutes):
     print(get_log_combined(target_services, last_n_minutes=last_n_minutes))
 
 
-def get_log_combined(systemctl_names: list[str], last_n_minutes=10):
+def get_log_combined(systemctl_names: list, last_n_minutes=10):
     systemctl_names = systemctl_names[:]
     for i in range(len(systemctl_names)-1, -1, -1):  # reverse from N-1, N-2, ..., 0
         systemctl_names.insert(i, "-u")
