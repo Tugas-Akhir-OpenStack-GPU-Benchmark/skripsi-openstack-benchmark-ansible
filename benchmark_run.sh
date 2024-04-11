@@ -20,8 +20,11 @@ if [ -n "$2" ]; then
   ANSIBLE_USER="$2"
 fi
 
+ansible_ssh_extra_args="-o StrictHostKeyChecking=no"
+ansible_ssh_common_args="-o StrictHostKeyChecking=no"
 
-
+export ANSIBLE_HOST_KEY_CHECKING=False
 export ANSIBLE_EXTRAVARS="ansible_host=$1 ansible_user=$ANSIBLE_USER ansible_ssh_private_key_file=~/.ssh/gcp"
 export ANSIBLE_EXTRAVARS="$ANSIBLE_EXTRAVARS ansible_ssh_common_args=\"$ansible_ssh_common_args\""
+export ANSIBLE_EXTRAVARS="$ANSIBLE_EXTRAVARS ansible_ssh_extra_args=\"$ansible_ssh_extra_args\""
 sudo ansible-playbook ./tasks/benchmark/main.yaml -i ./tasks/benchmark/inventory.txt -e "$ANSIBLE_EXTRAVARS"
