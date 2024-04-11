@@ -1,7 +1,8 @@
 # Tested
+INSTANCE_ID=$RANDOM
 
 # GPU
-gcloud compute instances create gpu-korea-2 \
+gcloud compute instances create korea-gpu-$INSTANCE_ID-2 \
     --project=law-2006463162 \
     --zone=asia-northeast3-c \
     --machine-type=custom-4-8192 \
@@ -21,7 +22,7 @@ gcloud compute instances create gpu-korea-2 \
 
 
 # Controller
-gcloud compute instances create korea-controller-$RANDOM-2 \
+gcloud compute instances create korea-controller-$INSTANCE_ID-2 \
     --project=law-2006463162 \
     --zone=asia-northeast3-c \
     --machine-type=e2-custom-4-8192 \

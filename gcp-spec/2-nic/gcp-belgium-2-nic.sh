@@ -1,3 +1,5 @@
+INSTANCE_ID=$RANDOM
+
 # GPU
 gcloud compute instances create belgium-$INSTANCE_ID-gpu-1 \
     --project=law-2006463162 \
