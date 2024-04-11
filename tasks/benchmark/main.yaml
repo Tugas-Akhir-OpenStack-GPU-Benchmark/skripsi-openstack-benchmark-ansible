@@ -3,6 +3,7 @@
   hosts: gcp
   become: True
   vars:
+    parent_directory: "{{ inventory_dir | dirname }}"
     base_path: /home/root
     local_prime_run: "./scripts/prime-run"
     prime_run: "{{ base_path }}/prime-run"

@@ -3,9 +3,12 @@
   command: "touch \"{{ base_path }}/php_is_installed\""
   args:
     creates: "{{ base_path }}/php_is_installed"
-- name: convert prime-run to linux just in case
-  command: "dos2unix \"{{ local_prime_run }}\""
-  delegate_to: localhost
+- name: convert all ansible-related file to LF end-of-line
+  command: "python3 ./scripts/convert-all-crlf-to-lf.py \"{{parent_directory}}\" 2>&1"
+  delegate_to: "localhost"
+  register: result
+- debug:
+    var: result
 - name: copy prime-run
   copy:
     src: "{{ local_prime_run }}"
