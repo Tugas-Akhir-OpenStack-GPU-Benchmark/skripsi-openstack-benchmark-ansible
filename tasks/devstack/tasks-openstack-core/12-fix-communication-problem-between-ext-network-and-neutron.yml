@@ -9,10 +9,10 @@
   # run it with argument: `ssh -o MACs=hmac-sha2-256 <HOST>`
   # or run it with argument: `ssh -o KexAlgorithms=ecdh-sha2-nistp521 fu@bar.com`
   # see https://serverfault.com/q/210408/982557
-- name: "Set br-ex mtu to 1200 to allow ssh-ing through Floating IP from Controller Node"  # condition: can ping but cannot ssh
-  command: "sudo ip li set mtu 1200 dev br-ex"
-  become: true
-  when: is_controller
+#- name: "Set br-ex mtu to 1200 to allow ssh-ing through Floating IP from Controller Node"  # condition: can ping but cannot ssh
+#  command: "sudo ip li set mtu 1200 dev br-ex"
+#  become: true
+#  when: is_controller
 
   
   # Step 7: Configure the default route in the network namespace

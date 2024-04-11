@@ -7,7 +7,7 @@
 #  failed_when: "result.rc != 0 or 'QEMU emulator version' not in result.stdout"
 #  changed_when: false
 
-- when: is_compute
+- when: "is_compute and configure_and_create_gpu_instances"
   become_user: root
   block:
     - name: "Install cpu-checker"
