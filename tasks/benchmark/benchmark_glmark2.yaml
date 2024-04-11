@@ -19,12 +19,18 @@
 
 
 
+
+
 - name: run glmark2 benchmarking 1920x1080
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 1920x1080 2>&1"
   become: true
   args:
     chdir: "{{ phoronix_folder }}"
   register: glmark2_benchmark_result
+  retries: 8
+  delay: 3
+  until: "glmark2_benchmark_result is not failed"
+
 
 - set_fact:
     cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
@@ -37,12 +43,18 @@
 
 
 
+
+
+
 - name: run glmark2 benchmarking 1440x810
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 1440x810 2>&1"
   become: true
   args:
     chdir: "{{ phoronix_folder }}"
   register: glmark2_benchmark_result
+  retries: 8
+  delay: 3
+  until: "glmark2_benchmark_result is not failed"
 
 - set_fact:
     cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
@@ -55,12 +67,17 @@
 
 
 
+
+
 - name: run glmark2 benchmarking 960x540
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 960x540 2>&1"
   become: true
   args:
     chdir: "{{ phoronix_folder }}"
   register: glmark2_benchmark_result
+  retries: 8
+  delay: 3
+  until: "glmark2_benchmark_result is not failed"
 
 - set_fact:
     cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
@@ -73,12 +90,18 @@
 
 
 
+
+
+
 - name: run glmark2 benchmarking 192x108
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 192x108 2>&1"
   become: true
   args:
     chdir: "{{ phoronix_folder }}"
   register: glmark2_benchmark_result
+  retries: 8
+  delay: 3
+  until: "glmark2_benchmark_result is not failed"
 
 - set_fact:
     cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
