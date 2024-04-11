@@ -1,12 +1,7 @@
-- import_tasks: ../install_dos2unix.yaml
 - name: Mark PHP as installed
   command: "touch \"{{ base_path }}/php_is_installed\""
   args:
     creates: "{{ base_path }}/php_is_installed"
-- name: convert all ansible-related file to LF end-of-line
-  command: "python3 ./scripts/convert-all-crlf-to-lf.py \"{{parent_directory}}\" 2>&1"
-  delegate_to: "localhost"
-  register: result
 - debug:
     var: result
 - name: copy prime-run

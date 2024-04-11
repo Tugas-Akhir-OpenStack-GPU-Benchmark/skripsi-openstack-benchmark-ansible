@@ -1,3 +1,9 @@
+### Convert all scripts to linux end-of-line separator
+- name: convert all ansible-related file to LF end-of-line
+  command: "python3 ./scripts/convert-all-crlf-to-lf.py \"{{parent_directory}}\" 2>&1"
+  delegate_to: "localhost"
+  register: result
+
 #### DEPENDENCIES
 - import_tasks: install_nvidia_smi.yaml
 - import_tasks: install_pexpect.yaml
