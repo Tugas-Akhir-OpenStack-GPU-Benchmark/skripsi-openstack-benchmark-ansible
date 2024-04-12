@@ -6,27 +6,27 @@
 ## Seems to successfully run `sudo ./prime-run env DISPLAY=:1 glmark2`
 ## Tapi belum uji coba complete-reset untuk uji coba ansible-nya
 
-- name: "install nvcc (CUDA)"
+- name: "xserver-xorg-video-nvidia-525, libnvidia-cfg1-525"
   apt:
     update_cache: yes
     name:
       - xserver-xorg-video-nvidia-525
       - libnvidia-cfg1-525
 
-- name: "install nvcc (CUDA)"
+- name: "nvidia-driver-525, nvidia-dkms-525"
   apt:
     update_cache: yes
     name:
       - nvidia-driver-525
       - nvidia-dkms-525
 
-- name: "install nvcc (CUDA)"
+- name: "nvidia-driver-525-server"
   apt:
     update_cache: yes
     name:
       -  nvidia-driver-525-server
 
-- name: "install nvcc (CUDA)"
+- name: "xserver-xorg-video-dummy, glmark2"
   apt:
     update_cache: yes
     name:
