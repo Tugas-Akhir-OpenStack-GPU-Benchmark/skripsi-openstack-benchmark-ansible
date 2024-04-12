@@ -51,7 +51,7 @@
   delegate_to: localhost
   copy:
     content: "{{ cleaned_glmark2_benchmark_result }}"
-    dest: temp/glmark2_benchmark_result_1920x1080.txt
+    dest: "{{benchmark_result_folder}}/glmark2_benchmark_result_1920x1080.txt"
 
 
 
@@ -75,7 +75,7 @@
   delegate_to: localhost
   copy:
     content: "{{ cleaned_glmark2_benchmark_result }}"
-    dest: temp/glmark2_benchmark_result_1440x810.txt
+    dest: "{{benchmark_result_folder}}/glmark2_benchmark_result_1440x810.txt"
 
 
 
@@ -98,7 +98,7 @@
   delegate_to: localhost
   copy:
     content: "{{ cleaned_glmark2_benchmark_result }}"
-    dest: temp/glmark2_benchmark_result_960x540.txt
+    dest: "{{benchmark_result_folder}}/glmark2_benchmark_result_960x540.txt"
 
 
 
@@ -122,5 +122,5 @@
   delegate_to: localhost
   copy:
     content: "{{ cleaned_glmark2_benchmark_result }}"
-    dest: temp/glmark2_benchmark_result_192x108.txt
+    dest: "{{benchmark_result_folder}}/glmark2_benchmark_result_192x108.txt"
 

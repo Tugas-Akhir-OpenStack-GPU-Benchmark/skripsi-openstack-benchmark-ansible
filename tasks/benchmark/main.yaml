@@ -9,6 +9,7 @@
     prime_run: "{{ base_path }}/prime-run"
     phoronix_folder: "{{ base_path }}/phoronix"
     phoronix_test_suite: "{{ phoronix_folder }}/phoronix-test-suite"
+    benchmark_result_folder: "../../benchmark_result"
 
     glmark2_version: 'glmark2-1.4.0'
     namd_version: 'namd-cuda-1.1.1'
@@ -19,7 +20,14 @@
     arch: "x86_64"
 
   tasks:
-    - name: ensure base_path is exists
-      command: "mkdir -p {{ base_path }}"
+    - name: ensure base_path folder exists
+      ansible.builtin.file:
+        path: "{{ base_path }}"
+        state: directory
+    - name: ensure benchmark_result_folder folder exists
+      delegate_to: localhost
+      ansible.builtin.file:
+        path: "{{benchmark_result_folder}}"
+        state: directory
     - name: Perform Benchmark
       import_tasks: perform_benchmark.yaml

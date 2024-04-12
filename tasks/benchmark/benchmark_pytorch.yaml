@@ -17,7 +17,7 @@
   delegate_to: localhost
   copy:
     content: "{{ cleaned_pytorch_install_result }}"
-    dest: temp/pytorch_install_result.txt
+    dest: "{{benchmark_result_folder}}/pytorch_install_result.txt"
 
 
 # Phoronix did validation for test-definition options that contains substring "nvidia" and "cuda". However,
@@ -77,4 +77,4 @@
   delegate_to: localhost
   copy:
     content: "{{ cleaned_pytorch_benchmark_result }}"
-    dest: temp/pytorch_benchmark_result.txt
+    dest: "{{benchmark_result_folder}}/pytorch_benchmark_result.txt"

@@ -15,7 +15,7 @@
   delegate_to: localhost
   copy:
     content: "{{ cleaned_namd_cuda_install_result }}"
-    dest: temp/namd_cuda_install_result.txt
+    dest: "{{benchmark_result_folder}}/namd_cuda_install_result.txt"
 
 
 - name: Check that NAMD f1atpase.zip downloaded successfully
@@ -66,4 +66,4 @@
   delegate_to: localhost
   copy:
     content: "{{ cleaned_namd_benchmark_result }}"
-    dest: temp/namd_benchmark_result.txt
+    dest: "{{benchmark_result_folder}}/namd_benchmark_result.txt"
