@@ -88,7 +88,7 @@ def get_gpuflavor_id_if_exists():
 
 
 def create_gpuflavor():
-    run_command(f'openstack flavor create --ram 2048 --disk 30 --vcpu 2 "{FLAVOR_NAME}"')
+    run_command(f'openstack flavor create --ram 4096 --disk 40 --vcpu 6 "{FLAVOR_NAME}"')
     if PCI_ALIAS is not None:
         run_command(f'openstack flavor set "{FLAVOR_NAME}" --property "pci_passthrough:alias"="{PCI_ALIAS}:1"')
     #run_command(f'openstack flavor set --property hw:numa_nodes=1 --property hw:numa_cpus.0=0,1 --property hw:numa_mem.0=2048 "{FLAVOR_NAME}"')
