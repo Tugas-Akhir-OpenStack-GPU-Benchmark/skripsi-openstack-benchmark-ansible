@@ -5,8 +5,8 @@
         msg: "Error install_xorg_headless_virtual_display.yaml, trying to purge nvidia-* and reboot"
     - name: "purging nvidia-*"
       command: "sudo apt-get remove --purge nvidia-* -y"
-    - name: "sudo apt autoremove"
-      command: "sudo apt autoremove"
+    - name: "sudo apt autoremove -y"
+      command: "sudo apt autoremove -y"
     - name: Reboot
       reboot:
         msg: "rebooting"
