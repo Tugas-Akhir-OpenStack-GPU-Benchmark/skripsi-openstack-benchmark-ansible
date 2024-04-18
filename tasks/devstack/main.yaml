@@ -32,8 +32,6 @@
       command: "python3 ./data/convert-all-crlf-to-lf.py \"{{parent_directory}}\" 2>&1"
       delegate_to: "localhost"
       register: result
-#    - debug:
-#        var: result
     - import_tasks: tasks-openstack-core/01-check-if-devstack-successfully-installed.yml
     - import_tasks: tasks-openstack-core/02-get-ip-addr-information.yml
     - block:
