@@ -50,6 +50,7 @@
                 - import_tasks: tasks-openstack-core/08-prepare-installation-script.yml
                 - import_tasks: tasks-openstack-core/09-setup-devstack-configuration.yml
                 - import_tasks: tasks-openstack-core/10-uninstall-devstack.yml
+                - import_tasks: tasks-configure-ironic/01-install-ironic-dependencies
                 - import_tasks: tasks-openstack-core/11-install-devstack.yml
             - import_tasks: tasks-openstack-core/12-fix-communication-problem-between-ext-network-and-neutron.yml
             - import_tasks: tasks-openstack-core/12-setup-startup-script.yml

@@ -1,0 +1,20 @@
+- name: Install Ironic Dependencies
+  become: true
+  apt:
+    name:
+      - build-essential
+      - python3-dev
+      - libssl-dev
+      - python3-pip
+      - libmysqlclient-dev
+      - libxml2-dev
+      - libxslt-dev
+      - libpq-dev
+      - git
+      - git-review
+      - libffi-dev
+      - gettext
+      - ipmitool
+      - psmisc
+      - graphviz
+      - libjpeg-dev
