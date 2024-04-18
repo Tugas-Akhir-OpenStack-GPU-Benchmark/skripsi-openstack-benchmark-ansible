@@ -11,18 +11,21 @@
     src: "../data/add-pci-to-nova-conf.py"
     dest: "{{base_path}}/add-pci-to-nova-conf.py"
     mode: "0777"
+
 - name: "run python script to configure nova GPU PCI Passthrough nova.conf"
   command: >-
     {{base_path}}/add-pci-to-nova-conf.py {{gpu_pci_vendor_id}} {{gpu_pci_product_id}} {{gpu_device_type}} 
     {{gpu_pci_openstack_alias_name}} "/etc/nova/nova.conf" {{node_type}}
   register: result_pci_nova
   changed_when: "result_pci_nova.stdout == 'modified'"
-- name: "run python script to configure nova GPU PCI Passthrough nova.conf"
+
+- name: "run python script to configure nova GPU PCI Passthrough nova-cpu.conf"
   command: >-
     {{base_path}}/add-pci-to-nova-conf.py {{gpu_pci_vendor_id}} {{gpu_pci_product_id}} {{gpu_device_type}} 
     {{gpu_pci_openstack_alias_name}} "/etc/nova/nova-cpu.conf" {{node_type}}
   register: result_pci_nova_cpu
   changed_when: "result_pci_nova_cpu.stdout == 'modified'"
+
 - name: Restart all devstack services
   shell: >-
     sudo systemctl restart devstack@*
