@@ -1,0 +1,6 @@
+- name: "Enable service openvswitch-switch if dead"
+  become_user: root
+  become: true
+  service:
+    name: openvswitch-switch
+    state: started

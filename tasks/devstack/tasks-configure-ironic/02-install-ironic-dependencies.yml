@@ -1,4 +1,5 @@
-- name: Install Ironic Dependencies
+- name: "Install Ironic Dependencies"
+  become_user: root
   become: true
   apt:
     name:

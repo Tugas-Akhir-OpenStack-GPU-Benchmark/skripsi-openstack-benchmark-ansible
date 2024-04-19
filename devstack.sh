@@ -68,4 +68,4 @@ fi
 
 export ANSIBLE_CACHE_PLUGIN=jsonfile
 
-ansible-playbook ./tasks/devstack/main.yaml -i ./tasks/devstack/inventory.yml -e "$ANSIBLE_EXTRAVARS"
+ansible-playbook ./tasks/devstack/main.yaml -i ./tasks/devstack/inventory.yml -e "$ANSIBLE_EXTRAVARS" -v
