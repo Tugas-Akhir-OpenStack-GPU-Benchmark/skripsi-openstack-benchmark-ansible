@@ -1,6 +1,8 @@
 #!/bin/bash
 
 
+ansible-galaxy install nvidia.nvidia_driver,v2.3.0
+
 if [ -z "$1" ]; then
     echo "Please provide SSH host (IP address) of the controller-instance as the first argument"
     exit
