@@ -1,6 +1,8 @@
 #!/bin/bash
 
 
+ansible-galaxy install nvidia.nvidia_driver,v2.3.0
+
 if [ -z "$1" ]; then
     echo "Please provide SSH host (IP address) of the controller-instance as the first argument"
     exit
@@ -30,6 +32,9 @@ if [[ $ssh_target_destination != *@* ]]; then
     exit 1
 fi
 
+
+
+
 IFS='@' read -r ansible_ssh_username ansible_ssh_target <<< "$ssh_target_destination"
 
 # Assumption appropriate ssh-key already exists (on the computer which run this ansible script)
@@ -38,5 +43,12 @@ export ANSIBLE_EXTRAVARS="ansible_host=$ansible_ssh_target ansible_user=$ansible
 export ANSIBLE_EXTRAVARS="$ANSIBLE_EXTRAVARS ansible_ssh_common_args=\"$ssh_jumphosts\""
 
 echo "$ANSIBLE_EXTRAVARS"
+
+if [ -n "$SUDO_PASS" ]; then
+  ANSIBLE_EXTRAVARS="$ANSIBLE_EXTRAVARS ansible_sudo_pass=\"$SUDO_PASS\""
+  echo "detected SUDO_PASS. Will use it for sudo authentication"
+else
+  echo "var SUDO_PASS is not set. Will assume target hosts don't need password to run sudo commands..."
+fi
 
 sudo ansible-playbook ./tasks/benchmark/main.yaml -i ./tasks/benchmark/inventory.txt -e "$ANSIBLE_EXTRAVARS"

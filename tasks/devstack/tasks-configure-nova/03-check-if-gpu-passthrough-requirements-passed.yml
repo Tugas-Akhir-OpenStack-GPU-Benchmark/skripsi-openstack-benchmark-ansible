@@ -17,7 +17,8 @@
       shell: >-
         virt-host-validate | grep "iommu.*PASS" -i
       register: iommu_enabled_2
-    - set_fact:
+
+    - set_fact:  # TODO rename misleading variable name. It should be iommu_not_enabled and iommu_not_enabled_2
         iommu_enabled: "{{ iommu_enabled.stdout | length == 0 }}"
         iommu_enabled_2: "{{ iommu_enabled_2.stdout | length == 0 }}"
     - debug:
@@ -29,12 +30,5 @@
     - fail:
         msg: "Please enable iommu by append either intel_iommu=on or amd_iommu=on to the GRUB_CMDLINE_LINUX_DEFAULT in /etc/default/grub"
       when: "iommu_enabled and iommu_enabled_2 and not ignore_iommu_not_detected_error"
-
-    - name: "Check if target PCI is in-use by"
-      become: true
-      ignore_errors: "{{ ignore_iommu_not_detected_error }}"
-      shell: >-
-        virt-host-validate | grep "iommu.*PASS" -i
-      register: iommu_enabled_2
 
 # sudo nano /etc/nova/nova.conf
