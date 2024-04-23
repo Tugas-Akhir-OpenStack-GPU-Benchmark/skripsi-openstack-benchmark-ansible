@@ -1,4 +1,3 @@
-# asia-northeast3-c
 - name: Main
   hosts: all
   become: True
