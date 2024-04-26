@@ -40,7 +40,7 @@
     name: gdm
   become: true
   register: gdm_service
-  failed_when: "gdm_service.rc is not succeeded and 'could not find the requested service' not in gdm_service.err.lower()"
+  failed_when: "gdm_service is not succeeded and 'could not find the requested service' not in gdm_service.err.lower()"
 
 - name: run glmark2 benchmarking 1920x1080
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 1920x1080 2>&1"
@@ -72,7 +72,7 @@
     name: gdm
   become: true
   register: gdm_service
-  failed_when: "gdm_service.rc is not succeeded and 'could not find the requested service' not in gdm_service.err.lower()"
+  failed_when: "gdm_service is not succeeded and 'could not find the requested service' not in gdm_service.err.lower()"
 
 - name: run glmark2 benchmarking 1440x810
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 1440x810 2>&1"
@@ -103,7 +103,7 @@
     name: gdm
   become: true
   register: gdm_service
-  failed_when: "gdm_service.rc is not succeeded and 'could not find the requested service' not in gdm_service.err.lower()"
+  failed_when: "gdm_service is not succeeded and 'could not find the requested service' not in gdm_service.err.lower()"
 
 - name: run glmark2 benchmarking 960x540
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 960x540 2>&1"
@@ -135,7 +135,7 @@
     name: gdm
   become: true
   register: gdm_service
-  failed_when: "gdm_service.rc is not succeeded and 'could not find the requested service' not in gdm_service.err.lower()"
+  failed_when: "gdm_service is not succeeded and 'could not find the requested service' not in gdm_service.err.lower()"
 
 - name: run glmark2 benchmarking 192x108
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 192x108 2>&1"
