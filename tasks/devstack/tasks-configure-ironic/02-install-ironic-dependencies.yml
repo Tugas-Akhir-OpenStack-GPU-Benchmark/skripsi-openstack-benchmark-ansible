@@ -19,3 +19,4 @@
       - psmisc
       - graphviz
       - libjpeg-dev
+      - mysql-client-core-8.0

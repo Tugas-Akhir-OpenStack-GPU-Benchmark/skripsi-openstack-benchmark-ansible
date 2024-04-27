@@ -1,16 +1,14 @@
 - set_fact:
     leftover_dnsmasq_path: "/opt/stack/devstack/dnsmasq"
-- name: "Check if dnsmasq folder still exists from previous ironic installations"
-  stat:
-    path: "{{ leftover_dnsmasq_path }}"
-  register: dnsmasq_stat_result
-- set_fact:
-    leftover_dnsmasq_exists: "{{ dnsmasq_stat_result.stat.exists }}"
-
 - name: "Remove leftover dnsmasq folder" # Unstack.sh/Clean.sh doesn't remove dnsmasq file
   file:
     path: "{{ leftover_dnsmasq_path }}"
     state: absent
-  when: leftover_dnsmasq_exists
 
+- set_fact:
+    leftover_virtualBMC_path: "/opt/stack/.vbmc/node-0"
 
+- name: "Remove leftover virtualBMC node-0"
+  file:
+    path: "{{ leftover_virtualBMC_path }}"
+    state: absent
