@@ -31,11 +31,19 @@
 
 
 
-
+# make sure no other apps using the GPU to ensure performance,
+# as per suggested in https://ubuntuforums.org/archive/index.php/t-2131425.html
+- name: Restart GDM service
+  systemd:
+    state: restarted
+    name: gdm
+  become: true
+  register: gdm_service
+  failed_when: "gdm_service is not succeeded and 'could not find the requested service' not in gdm_service.msg.lower()"
 
 - name: run glmark2 benchmarking 1920x1080
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 1920x1080 2>&1"
-  become: true
+  become: false  # glmark2 should be run without sudo to improve performance
   args:
     chdir: "{{ phoronix_folder }}"
   register: glmark2_benchmark_result
@@ -57,10 +65,19 @@
 
 
 
+- name: Restart GDM service
+  systemd:
+    state: restarted
+    name: gdm
+  become: true
+  register: gdm_service
+  failed_when: "gdm_service is not succeeded and 'could not find the requested service' not in gdm_service.msg.lower()"
 
+- debug:
+    var: gdm_service
 - name: run glmark2 benchmarking 1440x810
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 1440x810 2>&1"
-  become: true
+  become: false
   args:
     chdir: "{{ phoronix_folder }}"
   register: glmark2_benchmark_result
@@ -81,9 +98,17 @@
 
 
 
+- name: Restart GDM service
+  systemd:
+    state: restarted
+    name: gdm
+  become: true
+  register: gdm_service
+  failed_when: "gdm_service is not succeeded and 'could not find the requested service' not in gdm_service.msg.lower()"
+
 - name: run glmark2 benchmarking 960x540
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 960x540 2>&1"
-  become: true
+  become: false
   args:
     chdir: "{{ phoronix_folder }}"
   register: glmark2_benchmark_result
@@ -105,9 +130,17 @@
 
 
 
+- name: Restart GDM service
+  systemd:
+    state: restarted
+    name: gdm
+  become: true
+  register: gdm_service
+  failed_when: "gdm_service is not succeeded and 'could not find the requested service' not in gdm_service.msg.lower()"
+
 - name: run glmark2 benchmarking 192x108
   command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s 192x108 2>&1"
-  become: true
+  become: false
   args:
     chdir: "{{ phoronix_folder }}"
   register: glmark2_benchmark_result
