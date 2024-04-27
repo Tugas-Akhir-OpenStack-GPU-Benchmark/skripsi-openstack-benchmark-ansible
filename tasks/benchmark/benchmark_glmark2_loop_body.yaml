@@ -1,0 +1,31 @@
+# make sure no other apps using the GPU to ensure performance,
+# as per suggested in https://ubuntuforums.org/archive/index.php/t-2131425.html
+- name: "Restart GDM service {{benchmark_resolution}}"
+  systemd:
+    state: restarted
+    name: gdm
+  become: true
+  register: gdm_service
+  failed_when: "gdm_service is not succeeded and 'could not find the requested service' not in gdm_service.msg.lower()"
+
+- name: "run glmark2 benchmarking {{benchmark_resolution}}"
+  command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s {{benchmark_resolution}} -b :duration=3.0 2>&1"
+  become: false  # glmark2 should be run without sudo to improve performance
+  args:
+    chdir: "{{ phoronix_folder }}"
+  register: glmark2_benchmark_result
+  retries: 8
+  delay: 3
+  until: "glmark2_benchmark_result is not failed"
+
+
+- set_fact:  # replace coloring codes
+    cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+
+- name: "write glmark2 benchmark stdout logs {{benchmark_resolution}}"
+  delegate_to: localhost
+  copy:
+    content: "{{ cleaned_glmark2_benchmark_result }}"
+    dest: "{{benchmark_result_folder}}/glmark2_benchmark_result_{{benchmark_resolution}}.txt"
+
+
