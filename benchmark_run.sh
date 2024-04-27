@@ -17,7 +17,7 @@ fi
 
 
 ansible_ssh_extra_args="-o StrictHostKeyChecking=no"
-ansible_ssh_common_args="-o StrictHostKeyChecking=no"
+ansible_ssh_common_args="-o StrictHostKeyChecking=no -o ControlMaster=auto -o ControlPersist=120"
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 export ANSIBLE_EXTRAVARS="ansible_host=$1 ansible_ssh_private_key_file=~/.ssh/gcp"
