@@ -31,7 +31,7 @@
 
 - name: Perform Glmark2 benchmark
   include_tasks: ./benchmark_glmark2_loop_body.yaml
-  loop: "{{ ['1920x1080', '1366x768', '768x1024', '192x108'] }}"
+  loop: "{{ ['1920x1080', '1366x768', '360x800', '192x108'] }}"
   loop_control:
     loop_var: benchmark_resolution
 
