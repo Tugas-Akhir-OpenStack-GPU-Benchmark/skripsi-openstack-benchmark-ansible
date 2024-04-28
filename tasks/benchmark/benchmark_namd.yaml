@@ -60,6 +60,9 @@
     responses:
       'Would you like to save these test results': 'n'
   register: namd_benchmark_result
+  retries: 10
+  delay: 5
+  until: "namd_benchmark_result.rc != 0 and 'error' not in namd_benchmark_result.stdout.lower()"
 - set_fact:
     cleaned_namd_benchmark_result: "{{ namd_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
 - name: write namd benchmark logs
