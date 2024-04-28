@@ -14,8 +14,8 @@
   args:
     chdir: "{{ phoronix_folder }}"
   register: glmark2_benchmark_result
-  retries: 8
-  delay: 3
+  retries: 20
+  delay: 4
   until: "glmark2_benchmark_result is not failed"
 
 
