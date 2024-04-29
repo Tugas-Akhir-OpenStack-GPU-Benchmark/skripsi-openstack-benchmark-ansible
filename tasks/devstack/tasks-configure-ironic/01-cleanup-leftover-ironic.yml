@@ -12,3 +12,11 @@
   file:
     path: "{{ leftover_virtualBMC_path }}"
     state: absent
+
+- set_fact:
+    leftover_ironic_opt: "/opt/stack/ironic"
+
+- name: "remove leftover ironic library"
+  file:
+    path: "{{ leftover_ironic_opt }}"
+    state: absent
