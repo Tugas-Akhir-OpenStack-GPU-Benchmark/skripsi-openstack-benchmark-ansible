@@ -1,0 +1,28 @@
+- name: "copy add-pci-to-zun-conf.py to server"
+  copy:
+    src: "../data/add-pci-to-zun-conf.py"
+    dest: "{{base_path}}/add-pci-to-zun-conf.py"
+    mode: "0777"
+
+- name: "run python script to configure zun GPU PCI Passthrough zun.conf"
+  command: >-
+    {{base_path}}/add-pci-to-zun-conf.py {{gpu_pci_vendor_id}} {{gpu_pci_product_id}} {{gpu_device_type}} 
+    {{gpu_pci_openstack_alias_name}} "/etc/zun/zun.conf" {{node_type}}
+  register: result_pci_zun
+  changed_when: "result_pci_zun.stdout == 'modified'"
+
+- name: disable Zun from controller-node
+  when: is_controller
+  shell: >-
+    {{ source_admin_openrc_cmd }} openstack appcontainer service disable "{{ controller_host_name }}" zun-compute
+
+- name: "forcedown Zun from controller-node"
+  when: is_controller
+  shell: >-
+    {{ source_admin_openrc_cmd }} openstack appcontainer service forcedown "{{ controller_host_name }}" zun-compute
+
+- name: Restart all devstack services
+  shell: >-
+    sudo systemctl restart devstack@*
+  when: "result_pci_zun.stdout == 'modified'"
+  ignore_errors: true
