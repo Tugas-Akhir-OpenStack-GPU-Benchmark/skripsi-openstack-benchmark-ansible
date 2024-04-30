@@ -3,17 +3,20 @@
     update_cache: yes
     name:
       - pciutils
-- name: "Getting list of connected NVIDIA GPU / hardware"
-  shell: "lspci | (grep -i nvidia || true)"
-  register: lspci_assert_nvidia_exists
-- debug:
-    msg: "{{ lspci_assert_nvidia_exists }}"
-- name: "Assert NVIDIA GPU Hardware is connected / detected"
-  assert:
-    that:
-      - lspci_assert_nvidia_exists.stdout is defined
-      - lspci_assert_nvidia_exists.stdout != ""
-    fail_msg: "NVIDIA GPU Hardware is not detected"
+- name: "Ensure NVIDIA PCI is connected"
+  when: "validate_nvidia_pci_exists"
+  block:
+  - name: "Getting list of connected NVIDIA GPU / hardware"
+    shell: "lspci | (grep -i nvidia || true)"
+    register: lspci_assert_nvidia_exists
+  - debug:
+      msg: "{{ lspci_assert_nvidia_exists }}"
+  - name: "Assert NVIDIA GPU Hardware is connected / detected"
+    assert:
+      that:
+        - lspci_assert_nvidia_exists.stdout is defined
+        - lspci_assert_nvidia_exists.stdout != ""
+      fail_msg: "NVIDIA GPU Hardware is not detected"
 
 
 ### TODO disable nouveau if exists (https://docs.kinetica.com/7.1/install/nvidia_deb/)

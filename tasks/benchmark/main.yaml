@@ -15,6 +15,7 @@
     namd_version: 'namd-cuda-1.1.1'
     pytorch_phoronix_test_version: "pytorch-1.0.1"
     restart_gdm_service: true
+    validate_nvidia_pci_exists: true
 
     ### USER CONFIGURABLE VARS. See README.md
     distro: "ubuntu2004"
