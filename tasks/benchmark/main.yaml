@@ -14,10 +14,12 @@
     glmark2_version: 'glmark2-1.4.0'
     namd_version: 'namd-cuda-1.1.1'
     pytorch_phoronix_test_version: "pytorch-1.0.1"
+    restart_gdm_service: true
 
     ### USER CONFIGURABLE VARS. See README.md
     distro: "ubuntu2004"
     arch: "x86_64"
+
 
   tasks:
     - name: ensure base_path folder exists
