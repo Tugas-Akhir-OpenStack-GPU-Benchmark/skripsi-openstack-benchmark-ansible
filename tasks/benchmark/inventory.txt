@@ -1,8 +1,0 @@
-[local]
-localhost ansible_connection=local ansible_user=root
-
-[gcp]
-ansible-target-1
-
-[gcp:vars]
-ansible_connection=ssh
