@@ -1,12 +1,15 @@
 ## make sure no other apps using the GPU to ensure performance,
 ## as per suggested in https://ubuntuforums.org/archive/index.php/t-2131425.html
-- name: "Restart GDM service {{benchmark_resolution}}"
+- name: "Restart GDM service for benchmark {{benchmark_resolution}}"
   systemd:
     state: restarted
     name: gdm
   become: true
   register: gdm_service
-  failed_when: "gdm_service is not succeeded and 'could not find the requested service' not in gdm_service.msg.lower()"
+  failed_when:  >- 
+    gdm_service is not succeeded 
+    and 'could not find the requested service' not in gdm_service.msg.lower() 
+    and 'unknown state' not in gdm_service.msg.lower()
   when: restart_gdm_service
 
 - name: "run glmark2 benchmarking {{benchmark_resolution}}"
