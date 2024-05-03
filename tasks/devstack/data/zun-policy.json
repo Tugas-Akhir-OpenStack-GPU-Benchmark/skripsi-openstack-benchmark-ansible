@@ -1,0 +1,3 @@
+{
+    "container:create:privileged": "rule:context_is_admin"
+}

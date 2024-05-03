@@ -1,0 +1,15 @@
+- when: is_controller
+  block:
+    - set_fact:
+        policy_file_path: "/etc/zun/policy.json"
+    - name: "copy zun-policy.json to server"
+      copy:
+        src: "../data/zun-policy.json"
+        dest: "{{policy_file_path}}"
+        mode: "0777"
+
+    - name: "restart zun service"
+      command: "sudo systemctl restart devstack@zun*"
+      args:
+        warn: no
+      ignore_errors: yes
