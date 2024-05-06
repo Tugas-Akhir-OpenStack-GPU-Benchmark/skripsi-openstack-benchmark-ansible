@@ -24,3 +24,23 @@
     src: "../data/ssh-config"
     dest: "/root/.ssh/config"
     mode: "0700"
+
+
+
+- set_fact:
+    ssh_startup_script_location: "/root/ssh-startup-script.sh"
+
+- become: true
+  become_user: root
+  block:
+    - name: Upload ssh boot startup script
+      template:
+        src: "../data/ssh-startup-script.sh"
+        dest: "{{ ssh_startup_script_location }}"
+        mode: "0755"
+
+    - name: Register cronjob startup script to make sure ssh server always activated
+      cron:
+        name: "Reboot script to make sure ssh server always activated"
+        special_time: "reboot"
+        job: "{{ ssh_startup_script_location }}"  # The command or script you want to run
