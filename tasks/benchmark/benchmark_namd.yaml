@@ -55,8 +55,8 @@
   poll: 5
   become: true
   expect:
-    timeout: 800
-    command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=5 DISPLAY=:0 {{ phoronix_test_suite }} benchmark namd-cuda 2>&1"
+    timeout: 800  #  sample size 28 means 15% Margin of Error at 90% certainty (at least for UX surveys) https://measuringu.com/sample-size-recommendations/
+    command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=30 DISPLAY=:0 {{ phoronix_test_suite }} benchmark namd-cuda 2>&1"
     responses:
       'Would you like to save these test results': 'n'
   register: namd_benchmark_result
