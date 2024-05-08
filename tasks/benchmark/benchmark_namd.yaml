@@ -75,6 +75,14 @@
     remote_src: yes
   when: "not f1atpase_extracted_folder.stat.exists"
 
+
+- name: Start nvidia-smi-track.py for NAMD
+  shell: >-
+    {{ nvidia_track_py_script }} START "{{base_path}}/nvidia_smi_namd.txt"
+  async: 10000
+  poll: 0
+
+
 - name: run namd benchmark
   async: 10000
   poll: 5
@@ -89,6 +97,20 @@
 #  retries: 10
 #  delay: 5
 #  until: "namd_benchmark_result.rc != 0 and 'fatal error' not in namd_benchmark_result.stdout.lower()"
+
+- name: Stop nvidia-smi-track.py for NAMD
+  shell: >-
+    {{ nvidia_track_py_script }} STOP "{{base_path}}/nvidia_smi_namd.txt"
+  register: result
+
+- name: "write nvidia-smi-track.py for NAMD"
+  delegate_to: localhost
+  copy:
+    content: "{{ result.stdout }}"
+    dest: "{{benchmark_result_folder}}/nvidia_smi_namd.txt"
+
+
+
 
 - debug:
     msg: "{{namd_benchmark_result.rc != 0}}"

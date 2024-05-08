@@ -31,6 +31,13 @@
     dest: "{{ pytorch_profile_folder }}/test-definition.xml"
 
 
+- name: Start nvidia-smi-track.py for PyTorch
+  shell: >-
+    {{ nvidia_track_py_script }} START "{{base_path}}/nvidia_smi_pytorch.txt"
+  async: 10000
+  poll: 0
+
+
 - name: run pytorch benchmark  # Will run for about 35 minutes
   async: 1000000
   poll: 5
@@ -46,6 +53,18 @@
       'Device:': 'gpu'
   register: pytorch_benchmark_result
 
+
+
+- name: Stop nvidia-smi-track.py for PyTorch
+  shell: >-
+    {{ nvidia_track_py_script }} STOP "{{base_path}}/nvidia_smi_pytorch.txt"
+  register: result
+
+- name: "write nvidia-smi-track.py for PyTorch"
+  delegate_to: localhost
+  copy:
+    content: "{{ result.stdout }}"
+    dest: "{{benchmark_result_folder}}/nvidia_smi_pytorch.txt"
 
 # 1: CPU
 # 2: gpu
