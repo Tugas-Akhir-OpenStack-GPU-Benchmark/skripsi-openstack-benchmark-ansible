@@ -9,6 +9,10 @@
   args:
     chdir: "{{ phoronix_folder }}"
   register: namd_cuda_install_result
+  retries: 10
+  delay: 5
+  until: "namd_cuda_install_result is not failed or 'downloading of needed test files failed' in namd_cuda_install_result.stdout.lower()"
+
 - set_fact:
     cleaned_namd_cuda_install_result: "{{ namd_cuda_install_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
 - name: write namd-cuda install logs
