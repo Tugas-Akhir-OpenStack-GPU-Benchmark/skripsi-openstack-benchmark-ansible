@@ -7,7 +7,7 @@
   # ======================== BODY ========================
   - name: "Check if xorg async task still active ({{retry_count}})"
     async_status:
-      jid: "{{ xorg_display_server_async.results[0].ansible_job_id }}"
+      jid: "{{ xorg_display_server_async['ansible_job_id'] }}"
     register: xorg_display_server_status
 
 
@@ -18,6 +18,9 @@
     poll: 0
     register: xorg_display_server_async_next
     when: "xorg_display_server_status.finished"
+  - debug:
+      var: "xorg_display_server_async_next"
+
   - set_fact:
       xorg_display_server_async: "{{xorg_display_server_async_next}}"
     when: "xorg_display_server_async_next.results | length > 0"
