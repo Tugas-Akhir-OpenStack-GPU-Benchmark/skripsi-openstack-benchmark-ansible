@@ -4,14 +4,10 @@
 
 
 - name: install phoronix namd-cuda
+  command: "env DISPLAY=:0 ./phoronix-test-suite install {{ namd_version }} 2>&1"
   become: true
   args:
     chdir: "{{ phoronix_folder }}"
-  expect:
-    timeout: 1000
-    command: "env DISPLAY=:0 ./phoronix-test-suite install {{ namd_version }} 2>&1"
-    responses:
-      'Try downloading the file again (Y/n):': 'Y'  # when checksum failed, or error during download step
   register: namd_cuda_install_result
 - set_fact:
     cleaned_namd_cuda_install_result: "{{ namd_cuda_install_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
