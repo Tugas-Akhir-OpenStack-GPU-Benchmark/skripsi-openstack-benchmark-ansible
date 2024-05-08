@@ -1,4 +1,11 @@
-- block:
+- name: register status of ~/xorg_is_installed
+  stat:
+    path: "{{ base_path }}/xorg_is_installed"
+  register: xorg_is_installed
+
+
+- when: "not xorg_is_installed.stat.exists or force_apt_recheck"
+  block:
     - import_tasks: ./install_xorg_headless_virtual_display.yaml
   rescue:
     - debug:
@@ -11,6 +18,12 @@
       reboot:
         msg: "rebooting"
     - import_tasks: ./install_xorg_headless_virtual_display.yaml  # retry once again
+
+
+- name: Mark xorg as installed
+  command: "touch \"{{ base_path }}/xorg_is_installed\""
+  when: "not xorg_is_installed.stat.exists"
+
 
 
 ### TODO migrate from phoronix to direct apt-get installation
