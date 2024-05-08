@@ -65,6 +65,14 @@ else
   echo "var SUDO_PASS is not set. Will assume target hosts don't need password to run sudo commands..."
 fi
 
+if [ "$RETRY" = "1" ]; then
+  ANSIBLE_EXTRAVARS="$ANSIBLE_EXTRAVARS retry_files_enabled=True retry_files_save_path=./ansible-retry-temp.retry"
+  echo "detected RETRY. Will store checkpoints and will  continue latest failing task if detected"
+else
+  rm -f ./ansible-retry-temp.retry
+  echo "RETRY not detected... Will not retry on failing ansible task"
+fi
+
 
 export ANSIBLE_CACHE_PLUGIN=jsonfile
 

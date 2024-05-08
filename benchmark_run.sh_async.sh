@@ -7,4 +7,4 @@ else
   echo "detected ANSIBLE_CONNECTION_FOR_TARGET_HOST=$ANSIBLE_CONNECTION_FOR_TARGET_HOST"
 fi
 
-sudo env ANSIBLE_CONNECTION_FOR_TARGET_HOST="$ANSIBLE_CONNECTION_FOR_TARGET_HOST" SUDO_PASS="$SUDO_PASS" nohup ./benchmark_run.sh "$@" 2>&1 > "nohup_log $(date '+%F %H:%M:%S').txt" &
+sudo env RETRY="$RETRY" ANSIBLE_CONNECTION_FOR_TARGET_HOST="$ANSIBLE_CONNECTION_FOR_TARGET_HOST" SUDO_PASS="$SUDO_PASS" nohup ./benchmark_run.sh "$@" 2>&1 > "nohup_benchmark_log.txt" &
