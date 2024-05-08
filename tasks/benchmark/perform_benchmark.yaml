@@ -4,7 +4,12 @@
   delegate_to: "localhost"
   register: result
 
-### Async Download
+
+#### DEPENDENCIES
+- import_tasks: install_nvidia_smi.yaml
+
+# async download. Please put it after install_nvidia_smi.yaml because install_nvidia_smi.yaml has reboot command that
+# may corrupt the async download process
 - when: "use_namd_github_mirror"
   block:
     - set_fact:
@@ -24,9 +29,6 @@
 
 
 
-
-#### DEPENDENCIES
-- import_tasks: install_nvidia_smi.yaml
 - import_tasks: install_pexpect.yaml
 - import_tasks: download_phoronix.yaml
 - import_tasks: create_prime_run.yaml
