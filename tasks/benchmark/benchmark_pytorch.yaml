@@ -32,6 +32,7 @@
 
 
 - name: Start nvidia-smi-track.py for PyTorch
+  become: true
   shell: >-
     {{ nvidia_track_py_script }} START "{{base_path}}/nvidia_smi_pytorch.txt"
   async: 10000

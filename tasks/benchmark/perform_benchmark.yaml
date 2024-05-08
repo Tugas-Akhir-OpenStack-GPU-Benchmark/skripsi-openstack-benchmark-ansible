@@ -37,9 +37,11 @@
 - set_fact:
     nvidia_track_py_script: "{{ base_path }}/nvidia-smi-track.py"
 - name: Upload nvidia-smi-track.py
+  become: true
   copy:
     src: ./scripts/nvidia-smi-track.py
     dest: "{{ nvidia_track_py_script }}"
+    mode: "0755"
 
 
 #### TASKS

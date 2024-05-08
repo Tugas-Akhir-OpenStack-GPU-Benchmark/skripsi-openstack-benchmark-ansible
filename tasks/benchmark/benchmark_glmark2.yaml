@@ -23,6 +23,7 @@
       - libpng16-16
 
 - name: Start nvidia-smi-track.py for Glmark2
+  become: true
   shell: >-
     {{ nvidia_track_py_script }} START "{{base_path}}/nvidia_smi_glmark2.txt"
   async: 10000
