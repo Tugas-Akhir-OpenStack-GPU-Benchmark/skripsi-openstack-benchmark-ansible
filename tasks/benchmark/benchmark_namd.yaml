@@ -21,7 +21,7 @@
         remote_src: yes
     - set_fact:
         install_phoronix_namd_additional_env: >-
-          DOWNLOAD_CACHE="{{ namd_downloaded_mirror_cache_folder }}"
+          PTS_DOWNLOAD_CACHE="{{ namd_downloaded_mirror_cache_folder }}"
 
 
 - name: install phoronix namd-cuda
