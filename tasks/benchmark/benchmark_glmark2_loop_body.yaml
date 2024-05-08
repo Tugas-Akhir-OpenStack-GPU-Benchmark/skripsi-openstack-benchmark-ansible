@@ -24,6 +24,7 @@
 
   - set_fact:
       xorg_display_server_async: "{{xorg_display_server_async_next}}"
+    when: "'ansible_job_id' in xorg_display_server_async_next"
 
 
   ## make sure no other apps using the GPU to ensure performance,
