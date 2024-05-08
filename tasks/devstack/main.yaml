@@ -59,4 +59,5 @@
             # --------------------------------------Zun--------------------------------
             - import_tasks: tasks-configure-zun/01-zun-gpu-passthrough-requirements.yml
             - import_tasks: tasks-configure-zun/02-add-zun-policy-configuration.yml
+            # - import_tasks: tasks-configure-zun/03-create-zun-container.yml
             # --------------------------------------Ironic--------------------------------
