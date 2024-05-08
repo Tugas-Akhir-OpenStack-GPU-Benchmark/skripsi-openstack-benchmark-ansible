@@ -25,7 +25,6 @@
 
 
 - apt:
-    update_cache: yes
     name:
       - xauth
       - xorg
@@ -57,13 +56,11 @@
 # So we need to create symlink
 - name: "install nvcc (CUDA)"
   apt:
-    update_cache: yes
     name:
       - nvidia-cuda-toolkit
 
 - name: "install libfreeimage"  # for cudnn_samples_v8/mnistCUDNN
   apt:
-    update_cache: yes
     name:
       - libfreeimage3
       - libfreeimage-dev
