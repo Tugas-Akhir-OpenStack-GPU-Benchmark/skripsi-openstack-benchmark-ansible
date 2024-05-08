@@ -6,23 +6,23 @@
 ## Seems to successfully run `sudo ./prime-run env DISPLAY=:1 glmark2`
 ## Tapi belum uji coba complete-reset untuk uji coba ansible-nya
 
-- name: "xserver-xorg-video-nvidia-525, libnvidia-cfg1-525"
+- name: "xserver-xorg-video-nvidia-{{nvidia_driver_version}}, libnvidia-cfg1-{{nvidia_driver_version}}"
   apt:
     update_cache: yes
     name:
-      - xserver-xorg-video-nvidia-525
-      - libnvidia-cfg1-525
+      - "xserver-xorg-video-nvidia-{{nvidia_driver_version}}"
+      - "libnvidia-cfg1-{{nvidia_driver_version}}"
 
 - name: "nvidia-driver-525, nvidia-dkms-525"
   apt:
     name:
-      - nvidia-driver-525
-      - nvidia-dkms-525
+      - "nvidia-driver-{{nvidia_driver_version}}"
+      - "nvidia-dkms-{{nvidia_driver_version}}"
 
 - name: "nvidia-driver-525-server"
   apt:
     name:
-      -  nvidia-driver-525-server
+      -  "nvidia-driver-{{nvidia_driver_version}}-server"
 
 - name: "xserver-xorg-video-dummy, glmark2"
   apt:
