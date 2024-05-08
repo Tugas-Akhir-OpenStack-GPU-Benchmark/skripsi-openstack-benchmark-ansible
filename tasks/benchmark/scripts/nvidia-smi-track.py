@@ -92,7 +92,8 @@ def stop(temporary_file, resulting_file_name):
     assert False
 
 
-def all_gpu_inactive(gpu_stats: dict[str, tuple[int, int, list[str]]], threshold: int):
+# gpu_stats ==> dict[str, tuple[int, int, list[str]]]
+def all_gpu_inactive(gpu_stats: dict, threshold: int):
     for gpu_id, (gpu_util, memory_util, _) in gpu_stats.items():
         if gpu_util > threshold:
             return False
@@ -101,8 +102,8 @@ def all_gpu_inactive(gpu_stats: dict[str, tuple[int, int, list[str]]], threshold
     return True
 
 
-
-def get_stats() -> dict[str, tuple[int, int, list[str]]]:
+# return ==> dict[str, tuple[int, int, list[str]]]
+def get_stats() -> dict:
     nvidia_smi_xml = run_command("nvidia-smi -x -q")
     root = ET.fromstring(nvidia_smi_xml)
     gpus = list(filter(lambda x: x.tag == 'gpu', root))
@@ -119,7 +120,8 @@ def get_stats() -> dict[str, tuple[int, int, list[str]]]:
     return ret
 
 
-def get_processes(processes_xml_element) -> list[str]:
+# return ==> list[str]
+def get_processes(processes_xml_element) -> list:
     ret = []
     for process in processes_xml_element:
         process_name = list(filter(lambda x: x.tag == 'process_name', process))[0].text

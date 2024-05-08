@@ -22,6 +22,10 @@
     name:
       - libpng16-16
 
+- set_fact:
+    nvidia_track_py_script: "{{ base_path }}/nvidia-smi-track.py"
+  when: "nvidia_track_py_script is undefined"
+
 - name: Start nvidia-smi-track.py for Glmark2
   become: true
   shell: >-
