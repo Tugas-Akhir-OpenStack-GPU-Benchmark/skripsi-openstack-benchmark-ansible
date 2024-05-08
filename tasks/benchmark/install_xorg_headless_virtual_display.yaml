@@ -15,17 +15,20 @@
 
 - name: "nvidia-driver-525, nvidia-dkms-525"
   apt:
+    update_cache: yes
     name:
       - nvidia-driver-525
       - nvidia-dkms-525
 
 - name: "nvidia-driver-525-server"
   apt:
+    update_cache: yes
     name:
       -  nvidia-driver-525-server
 
 - name: "xserver-xorg-video-dummy, glmark2"
   apt:
+    update_cache: yes
     name:
       - xserver-xorg-video-dummy
       - glmark2

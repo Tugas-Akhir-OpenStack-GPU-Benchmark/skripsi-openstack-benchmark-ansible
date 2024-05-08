@@ -47,15 +47,9 @@
   when: "not nvidia_driver_is_installed.stat.exists"
 
 
-- name: Mark NVIDIA as installed
+- name: Mark PHP as installed
   command: "touch \"{{ base_path }}/nvidia_driver_is_installed\""
   when: "not nvidia_driver_is_installed.stat.exists"
-
-
-- name: register status of ~/cuda_driver_is_installed
-  stat:
-    path: "{{ base_path }}/cuda_driver_is_installed"
-  register: cuda_driver_is_installed
 
 
 # instead of installing in /usr/local/cuda, it will install in various folder (see dpkg -L nvidia-cuda-toolkit | grep include)
@@ -63,23 +57,20 @@
 # So we need to create symlink
 - name: "install nvcc (CUDA)"
   apt:
+    update_cache: yes
     name:
       - nvidia-cuda-toolkit
-  when: "not cuda_driver_is_installed.stat.exists or force_apt_recheck"
 
 - name: "install libfreeimage"  # for cudnn_samples_v8/mnistCUDNN
   apt:
+    update_cache: yes
     name:
       - libfreeimage3
       - libfreeimage-dev
-  when: "not cuda_driver_is_installed.stat.exists or force_apt_recheck"
-
 
 - file:
     path: "/usr/local/cuda"
     state: directory
-  when: "not cuda_driver_is_installed.stat.exists"
-
 
 # dpkg -L nvidia-cuda-toolkit | grep include
 # To fix missing /usr/local/cuda/include/cuda.h
@@ -88,8 +79,6 @@
     src: "/usr/include"
     dest: "/usr/local/cuda/include"
     state: link
-  when: "not cuda_driver_is_installed.stat.exists or force_apt_recheck"
-
 
 # dpkg -L nvidia-cuda-toolkit | grep bin
 # To fix missing /usr/local/cuda/bin/nvcc
@@ -98,7 +87,7 @@
     src: "/usr/bin"
     dest: "/usr/local/cuda/bin"
     state: link
-  when: "not cuda_driver_is_installed.stat.exists or force_apt_recheck"
+
 
 
 #- name: "Install dependencies"
@@ -107,9 +96,3 @@
 #    sudo apt-get -y install acpid dkms
 #- name: "Close X Server"
 #  command: "sudo ps aux | grep \"lightdm|gdm|kdm\""
-
-- name: Mark CUDA as installed
-  command: "touch \"{{ base_path }}/cuda_driver_is_installed\""
-  when: "not cuda_driver_is_installed.stat.exists"
-
-

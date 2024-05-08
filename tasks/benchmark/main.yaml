@@ -20,7 +20,6 @@
     use_namd_github_mirror: true
     namd_github_mirror: "https://github.com/Hzz-Hzz/Tugas-Akhir-OpenStack-LFS/raw/main/namd-download-cache.zip"
     namd_downloaded_mirror_cache_folder: "{{ base_path }}/namd-cache-folder"
-    force_apt_recheck: false
 
     ### USER CONFIGURABLE VARS. See README.md
     distro: "ubuntu2004"
