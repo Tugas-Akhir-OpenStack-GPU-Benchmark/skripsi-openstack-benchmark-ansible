@@ -39,9 +39,9 @@
   register: xorg_display_server_async
 
 - debug:
-    var: "{{xorg_display_server_async}}"
+    var: xorg_display_server_async
 - debug:
-    var: "{{xorg_display_server_async.results}}"
+    msg: xorg_display_server_async
 
 
 - name: Perform Glmark2 benchmark
