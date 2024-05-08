@@ -9,10 +9,15 @@
   block:
     - set_fact:
         namd_github_mirror_location: "{{ base_path }}/namd-mirror.zip"
+    - name: ensure benchmark_result_folder folder exists
+      ansible.builtin.file:
+        path: "{{namd_downloaded_mirror_cache_folder}}"
+        state: directory
     - name: Download Phoronix NAMD Github mirror
       ansible.builtin.get_url:
         url: "{{ namd_github_mirror }}"
         dest: "{{ namd_github_mirror_location }}"
+        timeout: 4000
       async: 4000
       poll: 0
       register: async_download_ubuntu_image
@@ -28,10 +33,10 @@
 
 #### TASKS
 
-#- import_tasks:
-#    file: ./benchmark_namd.yaml
-#- import_tasks:
-#    file: ./benchmark_glmark2.yaml
+- import_tasks:
+    file: ./benchmark_namd.yaml
+- import_tasks:
+    file: ./benchmark_glmark2.yaml
 - import_tasks:
     file: ./benchmark_pytorch.yaml
 

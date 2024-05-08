@@ -12,8 +12,8 @@
         jid: "{{ async_download_ubuntu_image.ansible_job_id }}"
       register: job_result
       until: job_result.finished
-      retries: 6200
-      delay: 2
+      retries: 4000
+      delay: 1
     - name: Extract NAMD mirror
       unarchive:
         src: "{{ namd_github_mirror_location }}"
