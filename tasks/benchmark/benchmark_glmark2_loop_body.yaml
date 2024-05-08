@@ -9,6 +9,7 @@
     async_status:
       jid: "{{ xorg_display_server_async['ansible_job_id'] }}"
     register: xorg_display_server_status
+    failed_when: false
 
 
   - name: run Xorg Display Server
@@ -23,7 +24,7 @@
 
   - set_fact:
       xorg_display_server_async: "{{xorg_display_server_async_next}}"
-    when: "xorg_display_server_async_next.results | length > 0"
+
 
   ## make sure no other apps using the GPU to ensure performance,
   ## as per suggested in https://ubuntuforums.org/archive/index.php/t-2131425.html
