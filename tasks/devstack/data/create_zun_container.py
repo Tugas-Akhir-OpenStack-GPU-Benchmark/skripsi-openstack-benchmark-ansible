@@ -8,7 +8,7 @@ import json
 import sys
 from time import sleep
 
-GPU_CONTAINER_NAME = "gpu-container"
+GPU_CONTAINER_NAME = "gpucontainer"
 IMAGE_NAME = "nvidia/cuda:12.4.1-cudnn-runtime-ubuntu20.04"
 
 def main():
@@ -22,14 +22,8 @@ def main():
 def create_gpu_container():
     delete_all_current_container_with_given_criteria(image_name=IMAGE_NAME, container_name=GPU_CONTAINER_NAME)
     container_uuid = create_container(GPU_CONTAINER_NAME)
-    running_container_with_uuid(container_uuid)
-    container_status = show_container_status(container_uuid)
-    print(f"GPU container {container_uuid} created with status: {container_status[0]}")
-    # print(f"GPU container {container_uuid} created with status: {container_status[0]}")
-    # if container_status[0].lower() == "error":
-    #     print("Stopped due to error...")
-    #     exit(1)
-
+    print(f"GPU container {container_uuid} created")
+    
 def delete_all_current_container_with_given_criteria(image_name=None, container_name=None):
     output = run_command("openstack appcontainer list --format=json", True)
     for container in output:
@@ -48,22 +42,10 @@ def get_all_current_container_with_given_criteria(image_name=None, container_nam
     return ret
 
 def create_container(container_name, image_name=IMAGE_NAME, allow_error=False):
-    output = run_command(f'openstack appcontainer create --name {container_name} --privileged --security-group {get_security_group_id("demo")} {IMAGE_NAME} /bin/bash', True, allow_error)
+    output = run_command(f'openstack appcontainer run --name {container_name} --cpu 6 --memory 4096 --privileged --security-group {get_security_group_id("demo")} {IMAGE_NAME} /bin/bash', True, allow_error)
     if isinstance(output, Error):
         return output
     return output['uuid']
-    
-def running_container_with_uuid(uuid):
-    output = run_command(f"openstack appcontainer start {uuid}", allow_error=True)
-    if isinstance(output, Error):
-        return output
-    return output
-
-# def exec_container_with_uuid(uuid):
-#     output = run_command(f"openstack appcontainer exec --interactive {uuid} /bin/bash", allow_error=True)
-#     if isinstance(output, Error):
-#         return output
-#     return output
 
 def get_security_group_id(project_name):
     security_groups = run_command(f'openstack security group list --project="{project_name}" --format=json', True)
@@ -71,16 +53,6 @@ def get_security_group_id(project_name):
         if sec_group['Name'] == "default":
             return sec_group['ID']
     raise Exception(f"Either project {project_name} does not exist or security group default does not exist")
-
-def show_container_status(container_id):
-    for _ in range(200):
-        output = run_command(f"openstack appcontainer show {container_id} --format=json", True)
-        if output['status'] in ('Error', 'Running'):
-            break
-        sleep(0.1)
-    else:
-        raise Exception(f"Timed out waiting instance status to be Error/Running. Stuck state: {output['status']}")
-    return output['status'], output['status_reason']
     
 def source_bash_script(file_path, *arguments):
     assert ' ' not in file_path

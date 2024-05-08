@@ -1,20 +1,14 @@
-# - when: is_compute
-#   block:
-#     - name: "copy create_zun_container.py to server"
-#       template:
-#         src: "../data/create_zun_container.py"
-#         dest: "{{base_path}}/create_zun_container.py"
-#         mode: "0777"
+- when: is_compute
+  block:
+    - name: "copy create_zun_container.py to server"
+      template:
+        src: "../data/create_zun_container.py"
+        dest: "{{base_path}}/create_zun_container.py"
+        mode: "0777"
 
-#     - name: "running create_zun_container.py to create GPU zun container"
-#       command: "{{base_path}}/create_zun_container.py \"{{admin_password}}\" gpu"
-#       register: create_zun_container_result
-#       when: configure_and_create_gpu_instances
-#     - debug:
-#         var: create_zun_container_result.stdout
-
-# openstack project list
-
-# openstack security group list
-
-# openstack appcontainer run --interactive --name gpu-container --privileged --security-group {} nvidia/cuda:12.4.1-cudnn-runtime-ubuntu20.04 /bin/bash
+    - name: "running create_zun_container.py to create GPU zun container"
+      command: "{{base_path}}/create_zun_container.py \"{{admin_password}}\" gpu"
+      register: create_zun_container_result
+      when: configure_and_create_gpu_instances
+    - debug:
+        var: create_zun_container_result.stdout
