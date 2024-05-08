@@ -46,44 +46,57 @@
   when: "not nvidia_driver_is_installed.stat.exists"
 
 
-- name: Mark PHP as installed
+- name: Mark NVIDIA as installed
   command: "touch \"{{ base_path }}/nvidia_driver_is_installed\""
   when: "not nvidia_driver_is_installed.stat.exists"
+
+
+- name: register status of ~/cudnn_is_installed
+  stat:
+    path: "{{ base_path }}/cudnn_is_installed"
+  register: cudnn_is_installed
+
 
 
 # instead of installing in /usr/local/cuda, it will install in various folder (see dpkg -L nvidia-cuda-toolkit | grep include)
 # which will make cudnn's assertion error (sudo make clean && sudo make at cudnn_samples_v8/mnistCUDNN)
 # So we need to create symlink
-- name: "install nvcc (CUDA)"
-  apt:
-    name:
-      - nvidia-cuda-toolkit
+- when: "not cudnn_is_installed.stat.exists"
+  block:
+  - name: "install nvcc (CUDA)"
+    apt:
+      name:
+        - nvidia-cuda-toolkit
 
-- name: "install libfreeimage"  # for cudnn_samples_v8/mnistCUDNN
-  apt:
-    name:
-      - libfreeimage3
-      - libfreeimage-dev
+  - name: "install libfreeimage"  # for cudnn_samples_v8/mnistCUDNN
+    apt:
+      name:
+        - libfreeimage3
+        - libfreeimage-dev
 
-- file:
-    path: "/usr/local/cuda"
-    state: directory
+  - file:
+      path: "/usr/local/cuda"
+      state: directory
 
-# dpkg -L nvidia-cuda-toolkit | grep include
-# To fix missing /usr/local/cuda/include/cuda.h
-- name: Create symbolic link to fix cudnn
-  file:
-    src: "/usr/include"
-    dest: "/usr/local/cuda/include"
-    state: link
+  # dpkg -L nvidia-cuda-toolkit | grep include
+  # To fix missing /usr/local/cuda/include/cuda.h
+  - name: Create symbolic link to fix cudnn
+    file:
+      src: "/usr/include"
+      dest: "/usr/local/cuda/include"
+      state: link
 
-# dpkg -L nvidia-cuda-toolkit | grep bin
-# To fix missing /usr/local/cuda/bin/nvcc
-- name: Create symbolic link to fix cudnn (2)
-  file:
-    src: "/usr/bin"
-    dest: "/usr/local/cuda/bin"
-    state: link
+  # dpkg -L nvidia-cuda-toolkit | grep bin
+  # To fix missing /usr/local/cuda/bin/nvcc
+  - name: Create symbolic link to fix cudnn (2)
+    file:
+      src: "/usr/bin"
+      dest: "/usr/local/cuda/bin"
+      state: link
+
+  - name: Mark CUDNN as installed
+    command: "touch \"{{ base_path }}/cudnn_is_installed\""
+    when: "not cudnn_is_installed.stat.exists"
 
 
 

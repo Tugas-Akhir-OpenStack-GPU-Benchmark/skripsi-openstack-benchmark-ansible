@@ -13,13 +13,13 @@
       - "xserver-xorg-video-nvidia-{{nvidia_driver_version}}"
       - "libnvidia-cfg1-{{nvidia_driver_version}}"
 
-- name: "nvidia-driver-525, nvidia-dkms-525"
+- name: "nvidia-driver-525, nvidia-dkms-{{nvidia_driver_version}}"
   apt:
     name:
       - "nvidia-driver-{{nvidia_driver_version}}"
       - "nvidia-dkms-{{nvidia_driver_version}}"
 
-- name: "nvidia-driver-525-server"
+- name: "nvidia-driver-{{nvidia_driver_version}}-server"
   apt:
     name:
       -  "nvidia-driver-{{nvidia_driver_version}}-server"
