@@ -1,11 +1,13 @@
 #!/bin/bash
-
 # run with sudo
 
-ansible-galaxy install nvidia.nvidia_driver,v2.3.0
+if [ ! -f ./not-first-time-run-benchmark.txt ]; then
+    sudo apt update
+    sudo apt install ansible -y
+    ansible-galaxy install nvidia.nvidia_driver,v2.3.0
+    touch not-first-time-run-benchmark.txt
+fi
 
-MAIN_SCRIPT="./tasks/benchmark/main.yaml"
-INVENTORY="./tasks/benchmark/inventory.txt"
 
 
 
