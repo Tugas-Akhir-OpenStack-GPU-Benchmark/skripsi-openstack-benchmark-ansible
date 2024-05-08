@@ -5,7 +5,7 @@
 - set_fact:
     install_phoronix_namd_additional_env: ""
 
-- when: "namd_github_mirror_location"
+- when: "use_namd_github_mirror"
   block:
     - name: "Waiting for NAMD mirror to be downloaded successfully"
       async_status:
