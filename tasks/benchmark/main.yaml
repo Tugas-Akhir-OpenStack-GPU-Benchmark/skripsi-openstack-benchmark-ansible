@@ -17,6 +17,10 @@
     restart_gdm_service: true
     validate_nvidia_pci_exists: true
 
+    use_namd_github_mirror: true
+    namd_github_mirror: "https://github.com/Hzz-Hzz/Tugas-Akhir-OpenStack-LFS/raw/main/namd-download-cache.zip"
+    namd_downloaded_mirror_cache_folder: "{{ base_path }}/namd-cache-folder"
+
     ### USER CONFIGURABLE VARS. See README.md
     distro: "ubuntu2004"
     arch: "x86_64"

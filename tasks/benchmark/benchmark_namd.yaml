@@ -2,9 +2,30 @@
   set_fact:
     namd_test_folder: '/var/lib/phoronix-test-suite/installed-tests/pts/{{ namd_version }}'
 
+- set_fact:
+    install_phoronix_namd_additional_env: ""
+
+- when: "namd_github_mirror_location"
+  block:
+    - name: "Waiting for NAMD mirror to be downloaded successfully"
+      async_status:
+        jid: "{{ async_download_ubuntu_image.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 6200
+      delay: 2
+    - name: Extract NAMD mirror
+      unarchive:
+        src: "{{ namd_github_mirror_location }}"
+        dest: "{{ namd_downloaded_mirror_cache_folder }}"
+        remote_src: yes
+    - set_fact:
+        install_phoronix_namd_additional_env: >-
+          DOWNLOAD_CACHE="{{ namd_downloaded_mirror_cache_folder }}"
+
 
 - name: install phoronix namd-cuda
-  command: "env DISPLAY=:0 ./phoronix-test-suite install {{ namd_version }} 2>&1"
+  command: "env DISPLAY=:0 {{install_phoronix_namd_additional_env}} ./phoronix-test-suite install {{ namd_version }} 2>&1"
   become: true
   args:
     chdir: "{{ phoronix_folder }}"
