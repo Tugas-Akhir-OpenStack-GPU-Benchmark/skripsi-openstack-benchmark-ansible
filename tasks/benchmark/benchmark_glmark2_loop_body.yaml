@@ -1,35 +1,58 @@
-## make sure no other apps using the GPU to ensure performance,
-## as per suggested in https://ubuntuforums.org/archive/index.php/t-2131425.html
-- name: "Restart GDM service for benchmark {{benchmark_resolution}}"
-  systemd:
-    state: restarted
-    name: gdm
-  become: true
-  register: gdm_service
-  failed_when:  >- 
-    gdm_service is not succeeded 
-    and 'could not find the requested service' not in gdm_service.msg.lower() 
-    and 'unknown state' not in gdm_service.msg.lower()
-  when: restart_gdm_service
+- block:
+  - name: "Increment the retry count ({{retry_count}})"
+    set_fact:
+      retry_count: "{{ 0 if retry_count is undefined else retry_count | int + 1 }}"
 
-- name: "run glmark2 benchmarking {{benchmark_resolution}}"
-  command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s {{benchmark_resolution}} -b :duration=3.0 2>&1"
-  become: false  # glmark2 should be run without sudo to improve performance
-  args:
-    chdir: "{{ phoronix_folder }}"
-  register: glmark2_benchmark_result
-  retries: 20
-  delay: 4
-  until: "glmark2_benchmark_result is not failed"
+  # Run body while error happens, do it until 10 times.
+  # ======================== BODY ========================
+  - name: "Check if xorg async task still active ({{retry_count}})"
+    async_status:
+      jid: "{{ xorg_display_server_async.ansible_job_id }}"
+    register: xorg_display_server_status
+
+  - name: run Xorg Display Server
+    command: "Xorg :1"
+    become: true
+    async: true
+    poll: 0
+    register: xorg_display_server_async
+    when: "xorg_display_server_status.finished"
+
+  ## make sure no other apps using the GPU to ensure performance,
+  ## as per suggested in https://ubuntuforums.org/archive/index.php/t-2131425.html
+  - name: "Restart GDM service for benchmark {{benchmark_resolution}} ({{retry_count}})"
+    systemd:
+      state: restarted
+      name: gdm
+    become: true
+    register: gdm_service
+    failed_when:  >- 
+      gdm_service is not succeeded 
+      and 'could not find the requested service' not in gdm_service.msg.lower() 
+      and 'unknown state' not in gdm_service.msg.lower()
+    when: restart_gdm_service
+
+  - name: "run glmark2 benchmarking {{benchmark_resolution}} ({{retry_count}})"
+    command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s {{benchmark_resolution}} -b :duration=3.0 2>&1"
+    become: false  # glmark2 should be run without sudo to improve performance
+    args:
+      chdir: "{{ phoronix_folder }}"
+    register: glmark2_benchmark_result
 
 
-- set_fact:  # replace coloring codes
-    cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+  - set_fact:  # replace coloring codes
+      cleaned_glmark2_benchmark_result: "{{ glmark2_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
 
-- name: "write glmark2 benchmark stdout logs {{benchmark_resolution}}"
-  delegate_to: localhost
-  copy:
-    content: "{{ cleaned_glmark2_benchmark_result }}"
-    dest: "{{benchmark_result_folder}}/glmark2_benchmark_result_{{benchmark_resolution}}.txt"
+  - name: "write glmark2 benchmark stdout logs {{benchmark_resolution}}"
+    delegate_to: localhost
+    copy:
+      content: "{{ cleaned_glmark2_benchmark_result }}"
+      dest: "{{benchmark_result_folder}}/glmark2_benchmark_result_{{benchmark_resolution}}.txt"
+  # ======================== END BODY ========================
 
+  rescue:
+    - fail:
+        msg: Maximum retries of grouped tasks reached
+      when: retry_count | int == 10
+    - include_task: coupled_task_group.yml
 

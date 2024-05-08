@@ -36,6 +36,8 @@
   become: true
   async: true
   poll: 0
+  register: xorg_display_server_async
+
 
 - name: Perform Glmark2 benchmark
   include_tasks: ./benchmark_glmark2_loop_body.yaml
