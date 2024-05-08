@@ -7,16 +7,20 @@
   # ======================== BODY ========================
   - name: "Check if xorg async task still active ({{retry_count}})"
     async_status:
-      jid: "{{ xorg_display_server_async.ansible_job_id }}"
+      jid: "{{ xorg_display_server_async.results[0].ansible_job_id }}"
     register: xorg_display_server_status
+
 
   - name: run Xorg Display Server
     command: "Xorg :1"
     become: true
     async: true
     poll: 0
-    register: xorg_display_server_async
+    register: xorg_display_server_async_next
     when: "xorg_display_server_status.finished"
+  - set_fact:
+      xorg_display_server_async: "{{xorg_display_server_async_next}}"
+    when: "xorg_display_server_async_next.results | length > 0"
 
   ## make sure no other apps using the GPU to ensure performance,
   ## as per suggested in https://ubuntuforums.org/archive/index.php/t-2131425.html
