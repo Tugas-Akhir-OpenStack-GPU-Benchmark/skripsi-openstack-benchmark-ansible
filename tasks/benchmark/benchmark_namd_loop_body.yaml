@@ -36,6 +36,7 @@
     failed_when: >-
       namd_benchmark_result.rc != 0 and 'E: FATAL ERROR' in namd_benchmark_result.stdout 
       or 'The test run did not produce a result' in namd_benchmark_result.stdout 
+      or 'ATPase Simulation' not in namd_benchmark_result.stdout 
 
   - debug:
       msg: "{{namd_benchmark_result.rc != 0}}"
