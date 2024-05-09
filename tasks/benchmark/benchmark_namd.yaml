@@ -93,6 +93,11 @@
     loop_var: benchmark_batch_number
 
 
+- name: Stop nvidia-smi-track.py for NAMD
+  shell: >-
+    {{ nvidia_track_py_script }} STOP "{{base_path}}/track_result_nvidia_smi_namd.txt"
+  register: result
+
 - name: "write nvidia-smi-track.py for NAMD"
   delegate_to: localhost
   copy:
