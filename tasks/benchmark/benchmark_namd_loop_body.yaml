@@ -5,6 +5,11 @@
 
   # Run body while error happens, do it until 10 times.
   # ======================== BODY ========================
+  - set_fact:
+      num_of_samples_per_batch: 2
+  - set_fact:
+      namd_timeout_duration_per_batch: "{{(num_of_samples_per_batch | int) * (namd_timeout_duration_per_sample | int)}}"
+
   - set_fact:  # only if we jump to this somewhere due to debugging this ansible script
       nvidia_track_py_script: "{{ base_path }}/nvidia-smi-track.py"
     when: "nvidia_track_py_script is undefined"
@@ -18,13 +23,13 @@
 
 
   - name: "run namd benchmark {{benchmark_batch_number}}"
-    async: 10000
+    async: "{{ namd_timeout_duration_per_batch }}"
     poll: 5
     become: true
     expect:
       # average of 29 samples, each samples take 25.79310344827586 seconds. Total at least 14 mins for 30 tests
-      timeout: 800
-      command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=5 DISPLAY=:0 {{ phoronix_test_suite }} benchmark {{ namd_version }} 2>&1"
+      timeout: "{{ namd_timeout_duration_per_batch }}"  # needed to be small because sometimes on Nova NAMD fails to use GPU (use CPU instead) without error
+      command: "{{ prime_run }} env FORCE_TIMES_TO_RUN={{num_of_samples_per_batch}} DISPLAY=:0 {{ phoronix_test_suite }} benchmark {{ namd_version }} 2>&1"
       responses:
         'Would you like to save these test results': 'n'
     register: namd_benchmark_result

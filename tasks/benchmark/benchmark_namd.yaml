@@ -82,7 +82,7 @@
 # So we need to make checkpoint for every 5 consecutive NAMD success
 - name: Perform NAMD benchmark
   include_tasks: ./benchmark_namd_loop_body.yaml
-  loop: "{{ ['1', '2', '3', '4', '5', '6'] }}"
+  with_sequence: start=1 end=15
   loop_control:
     loop_var: benchmark_batch_number
 
