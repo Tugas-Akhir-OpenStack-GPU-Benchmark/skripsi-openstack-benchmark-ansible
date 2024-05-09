@@ -46,12 +46,12 @@ def start(temporary_file, resulting_file_name):
         for process, (gpu_util, memory_util) in process_to_utilization_mapping.items():
             if process not in process_to_total_utilization_mapping:
                 process_to_total_utilization_mapping[process] = {'gpu-sum': 0, 'gpu-mem-sum': 0, 'count': 0}
+                initialize_track_result(process_to_total_utilization_mapping[process], 'gpu')
+                initialize_track_result(process_to_total_utilization_mapping[process], 'gpu-mem')
             utilization = process_to_total_utilization_mapping[process]
-            utilization['gpu-sum'] += gpu_util
-            utilization['gpu-mem-sum'] += memory_util
             utilization['count'] += 1
-            utilization['gpu-avg'] = utilization['gpu-sum'] / utilization['count']
-            utilization['gpu-mem-avg'] = utilization['gpu-mem-sum'] / utilization['count']
+            update_track_result(gpu_util, utilization, 'gpu')
+            update_track_result(memory_util, utilization, 'gpu-mem')
         write_to_json_file(temporary_file, process_to_total_utilization_mapping)
 
         sleep(PERIOD)
@@ -60,6 +60,29 @@ def start(temporary_file, resulting_file_name):
             return
         if not os.path.isfile(temporary_file):
             return
+
+def initialize_track_result(utilization: dict, util_label: str):
+    utilization[f'{util_label}-sum'] = 0
+    utilization[f'{util_label}-avg'] = 0
+    utilization[f'{util_label}-variance'] = 0
+    utilization[f'{util_label}-high-values'] = []
+
+
+def update_track_result(util_value: int, utilization: dict, util_label: str):
+    n = utilization['count']
+    utilization[f'{util_label}-sum'] += util_value
+    prev_avg = utilization[f'{util_label}-avg']
+    utilization[f'{util_label}-avg'] = utilization[f'{util_label}-sum'] / n
+    avg = utilization[f'{util_label}-avg']
+
+    prev_variance = utilization[f'{util_label}-variance']
+    prev_stdev = prev_variance**.5
+    if util_value > prev_avg + min(5, prev_stdev) and util_value not in utilization[f'{util_label}-high-values']:
+        utilization[f'{util_label}-high-values'].append(util_value)
+
+    # https://math.stackexchange.com/a/775678/832937
+    if n >= 2:
+        utilization[f'{util_label}-variance'] = ((n-2)*prev_variance + (util_value - avg) * (util_value - prev_avg)) / (n-1)
 
 
 def get_process_to_utilization_mapping(nvidia_smi_result: dict):
