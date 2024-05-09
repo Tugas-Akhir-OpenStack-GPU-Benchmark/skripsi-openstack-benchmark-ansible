@@ -125,6 +125,9 @@ def stop(temporary_file, resulting_file_name):
             with open(resulting_file_name, 'r') as f:
                 print(f.read())
             return
+        except FileNotFoundError:
+            print(f"Warning: file not found error {temporary_file}, {repr(e)}")
+            return
         except Exception as e:
             print(f"Error when trying to rename file {temporary_file}, {repr(e)}. Retrying again...", file=sys.stderr)
             sleep(2 + random())
