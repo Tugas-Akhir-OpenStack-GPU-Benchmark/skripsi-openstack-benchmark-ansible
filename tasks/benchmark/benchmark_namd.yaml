@@ -79,7 +79,7 @@
 - name: Start nvidia-smi-track.py for NAMD
   become: true
   shell: >-
-    {{ nvidia_track_py_script }} START "{{base_path}}/nvidia_smi_namd.txt"
+    {{ nvidia_track_py_script }} START "{{base_path}}/track_result_nvidia_smi_namd.txt"
   async: 10000
   poll: 0
 
@@ -101,7 +101,7 @@
 
 - name: Stop nvidia-smi-track.py for NAMD
   shell: >-
-    {{ nvidia_track_py_script }} STOP "{{base_path}}/nvidia_smi_namd.txt"
+    {{ nvidia_track_py_script }} STOP "{{base_path}}/track_result_nvidia_smi_namd.txt"
   register: result
 
 - name: "write nvidia-smi-track.py for NAMD"

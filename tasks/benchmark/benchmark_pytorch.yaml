@@ -34,7 +34,7 @@
 - name: Start nvidia-smi-track.py for PyTorch
   become: true
   shell: >-
-    {{ nvidia_track_py_script }} START "{{base_path}}/nvidia_smi_pytorch.txt"
+    {{ nvidia_track_py_script }} START "{{base_path}}/track_result_nvidia_smi_pytorch.txt"
   async: 10000
   poll: 0
 
@@ -58,7 +58,7 @@
 
 - name: Stop nvidia-smi-track.py for PyTorch
   shell: >-
-    {{ nvidia_track_py_script }} STOP "{{base_path}}/nvidia_smi_pytorch.txt"
+    {{ nvidia_track_py_script }} STOP "{{base_path}}/track_result_nvidia_smi_pytorch.txt"
   register: result
 
 - name: "write nvidia-smi-track.py for PyTorch"

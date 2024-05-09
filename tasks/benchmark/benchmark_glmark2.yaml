@@ -29,7 +29,7 @@
 - name: Start nvidia-smi-track.py for Glmark2
   become: true
   shell: >-
-    {{ nvidia_track_py_script }} START "{{base_path}}/nvidia_smi_glmark2.txt"
+    {{ nvidia_track_py_script }} START "{{base_path}}/track_result_nvidia_smi_glmark2.txt"
   async: 10000
   poll: 0
 
@@ -56,7 +56,7 @@
 
 - name: Stop nvidia-smi-track.py for Glmark2
   shell: >-
-    {{ nvidia_track_py_script }} STOP "{{base_path}}/nvidia_smi_glmark2.txt"
+    {{ nvidia_track_py_script }} STOP "{{base_path}}/track_result_nvidia_smi_glmark2.txt"
   register: result
 
 - name: "write nvidia-smi-track.py for Glmark2"

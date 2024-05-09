@@ -16,11 +16,12 @@ MAX_INACTIVE_LOOP = MAX_INACTIVE_DURATION / PERIOD
 
 def main(mode, resulting_file_name):
     assert mode in ('START', 'STOP')
-    temporary_file = os.path.join(os.path.dirname(resulting_file_name), "." + os.path.basename(resulting_file_name))
+    temporary_file = os.path.join(os.path.dirname(resulting_file_name), "~" + os.path.basename(resulting_file_name))
 
     if mode == 'STOP':
         stop(temporary_file, resulting_file_name)
         return
+    print("Starting")
     start(temporary_file, resulting_file_name)
     print("Stopped")
 
@@ -36,8 +37,10 @@ def start(temporary_file, resulting_file_name):
     while True:
         result = get_stats()
         inactive_limit -= 1
-        if not all_gpu_inactive(result, 10):
+        max_utilization = max_gpu_utilization(result)
+        if max_utilization > 8:
             inactive_limit = MAX_INACTIVE_LOOP
+        print(f"inactive_limit = {inactive_limit}, max_utilization={max_utilization}")
 
         process_to_utilization_mapping = get_process_to_utilization_mapping(result)
         for process, (gpu_util, memory_util) in process_to_utilization_mapping.items():
@@ -93,13 +96,11 @@ def stop(temporary_file, resulting_file_name):
 
 
 # gpu_stats ==> dict[str, tuple[int, int, list[str]]]
-def all_gpu_inactive(gpu_stats: dict, threshold: int):
+def max_gpu_utilization(gpu_stats: dict) -> int:
+    ret = 0
     for gpu_id, (gpu_util, memory_util, _) in gpu_stats.items():
-        if gpu_util > threshold:
-            return False
-        if memory_util > threshold:
-            return False
-    return True
+        ret = max(ret, gpu_util)
+    return ret
 
 
 # return ==> dict[str, tuple[int, int, list[str]]]
