@@ -88,6 +88,9 @@ def update_track_result(util_value: int, utilization: dict, util_label: str):
 def get_process_to_utilization_mapping(nvidia_smi_result: dict):
     process_to_utilization_mapping = {}
     for gpu_id, (gpu_util, memory_util, process_list) in nvidia_smi_result.items():
+        if len(process_list) == 0:
+            # to make sure the result always exist just in case NVIDIA-SMI cant track running program such as in Zun
+            process_list = ['']
         for process in process_list:
             if process not in process_to_utilization_mapping:
                 process_to_utilization_mapping[process] = [0, 0]
