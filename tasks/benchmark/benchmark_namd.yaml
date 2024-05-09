@@ -83,26 +83,15 @@
   async: 10000
   poll: 0
 
+# perform 6 batches, each 5 samples = 30 samples. Need to split into batches because for Nova Instance,
+# NAMD oftenly error. If samples in one batch is too big, then the chance of error will also bigger.
+# So we need to make checkpoint for every 5 consecutive NAMD success
+- name: Perform NAMD benchmark
+  include_tasks: ./benchmark_namd_loop_body.yaml
+  loop: "{{ ['1', '2', '3', '4', '5', '6'] }}"
+  loop_control:
+    loop_var: benchmark_batch_number
 
-- name: run namd benchmark
-  async: 10000
-  poll: 5
-  become: true
-  expect:
-    # average of 29 samples, each samples take 25.79310344827586 seconds. Total at least 14 mins for 30 tests
-    timeout: 2100  #  sample size 28 means 15% Margin of Error at 90% certainty (at least for UX surveys) https://measuringu.com/sample-size-recommendations/
-    command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=30 DISPLAY=:0 {{ phoronix_test_suite }} benchmark namd-cuda 2>&1"
-    responses:
-      'Would you like to save these test results': 'n'
-  register: namd_benchmark_result
-  retries: 20
-  delay: 5
-  until: "namd_benchmark_result.rc != 0 and 'E: FATAL ERROR' not in namd_benchmark_result.stdout"
-
-- name: Stop nvidia-smi-track.py for NAMD
-  shell: >-
-    {{ nvidia_track_py_script }} STOP "{{base_path}}/track_result_nvidia_smi_namd.txt"
-  register: result
 
 - name: "write nvidia-smi-track.py for NAMD"
   delegate_to: localhost
@@ -112,18 +101,3 @@
 
 
 
-
-- debug:
-    msg: "{{namd_benchmark_result.rc != 0}}"
-- debug:
-    msg: "{{'fatal error' not in namd_benchmark_result.stdout.lower()}}"
-- debug:
-    msg: "{{namd_benchmark_result.stdout.lower()}}"
-
-- set_fact:
-    cleaned_namd_benchmark_result: "{{ namd_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
-- name: write namd benchmark logs
-  delegate_to: localhost
-  copy:
-    content: "{{ cleaned_namd_benchmark_result }}"
-    dest: "{{benchmark_result_folder}}/namd_benchmark_result.txt"
