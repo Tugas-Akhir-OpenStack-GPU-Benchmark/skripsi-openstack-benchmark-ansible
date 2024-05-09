@@ -12,7 +12,7 @@
   register: namd_benchmark_result
   retries: 20
   delay: 5
-  until: "namd_benchmark_result.rc != 0 and 'E: FATAL ERROR' not in namd_benchmark_result.stdout"
+  until: "namd_benchmark_result.rc == 0 and 'E: FATAL ERROR' not in namd_benchmark_result.stdout"
 
 - debug:
     msg: "{{namd_benchmark_result.rc != 0}}"
