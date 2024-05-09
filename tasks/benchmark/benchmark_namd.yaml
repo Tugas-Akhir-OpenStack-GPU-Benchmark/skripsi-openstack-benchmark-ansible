@@ -97,7 +97,7 @@
   register: namd_benchmark_result
   retries: 20
   delay: 5
-  until: "namd_benchmark_result.rc != 0 and 'fatal error' not in namd_benchmark_result.stdout.lower()"
+  until: "namd_benchmark_result.rc != 0 and 'E: FATAL ERROR' not in namd_benchmark_result.stdout"
 
 - name: Stop nvidia-smi-track.py for NAMD
   shell: >-
