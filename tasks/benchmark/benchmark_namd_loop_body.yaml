@@ -64,7 +64,7 @@
   rescue:
     - fail:
         msg: Maximum retries of grouped tasks reached
-      when: retry_count | int == 10
+      when: retry_count | int == 20
     - name: Reboot because NAMD benchmark failed
       reboot:
         msg: "rebooting"
