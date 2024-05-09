@@ -1,30 +1,68 @@
+- block:
+  - name: "Increment the retry count ({{retry_count}})"
+    set_fact:
+      retry_count: "{{ 0 if retry_count is undefined else retry_count | int + 1 }}"
 
-- name: "run namd benchmark {{benchmark_batch_number}}"
-  async: 10000
-  poll: 5
-  become: true
-  expect:
-    # average of 29 samples, each samples take 25.79310344827586 seconds. Total at least 14 mins for 30 tests
-    timeout: 800
-    command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=5 DISPLAY=:0 {{ phoronix_test_suite }} benchmark {{ namd_version }} 2>&1"
-    responses:
-      'Would you like to save these test results': 'n'
-  register: namd_benchmark_result
-  retries: 20
-  delay: 5
-  until: "namd_benchmark_result.rc == 0 and 'E: FATAL ERROR' not in namd_benchmark_result.stdout"
+  # Run body while error happens, do it until 10 times.
+  # ======================== BODY ========================
+  - name: Start nvidia-smi-track.py for NAMD
+    become: true
+    shell: >-
+      {{ nvidia_track_py_script }} START "{{base_path}}/track_result_nvidia_smi_namd.txt"
+    async: 10000
+    poll: 0
 
-- debug:
-    msg: "{{namd_benchmark_result.rc != 0}}"
-- debug:
-    msg: "{{'fatal error' not in namd_benchmark_result.stdout.lower()}}"
-- debug:
-    msg: "{{namd_benchmark_result.stdout.lower()}}"
 
-- set_fact:
-    cleaned_namd_benchmark_result: "{{ namd_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
-- name: "write namd benchmark logs {{benchmark_batch_number}}"
-  delegate_to: localhost
-  copy:
-    content: "{{ cleaned_namd_benchmark_result }}"
-    dest: "{{benchmark_result_folder}}/namd_benchmark_result_{{benchmark_batch_number}}.txt"
+  - name: "run namd benchmark {{benchmark_batch_number}}"
+    async: 10000
+    poll: 5
+    become: true
+    expect:
+      # average of 29 samples, each samples take 25.79310344827586 seconds. Total at least 14 mins for 30 tests
+      timeout: 800
+      command: "{{ prime_run }} env FORCE_TIMES_TO_RUN=5 DISPLAY=:0 {{ phoronix_test_suite }} benchmark {{ namd_version }} 2>&1"
+      responses:
+        'Would you like to save these test results': 'n'
+    register: namd_benchmark_result
+    failed_when: >-
+      namd_benchmark_result.rc != 0 and 'E: FATAL ERROR' in namd_benchmark_result.stdout 
+      or 'The test run did not produce a result' in namd_benchmark_result.stdout 
+
+  - debug:
+      msg: "{{namd_benchmark_result.rc != 0}}"
+  - debug:
+      msg: "{{'fatal error' not in namd_benchmark_result.stdout.lower()}}"
+  - debug:
+      msg: "{{namd_benchmark_result.stdout.lower()}}"
+
+  - set_fact:
+      cleaned_namd_benchmark_result: "{{ namd_benchmark_result.stdout | regex_replace('\x1B\\[[0-9;]*[mK]', '') }}"
+  - name: "write namd benchmark logs {{benchmark_batch_number}}"
+    delegate_to: localhost
+    copy:
+      content: "{{ cleaned_namd_benchmark_result }}"
+      dest: "{{benchmark_result_folder}}/namd_benchmark_result_{{benchmark_batch_number}}.txt"
+
+  - name: Stop nvidia-smi-track.py for NAMD
+    shell: >-
+      {{ nvidia_track_py_script }} STOP "{{base_path}}/track_result_nvidia_smi_namd.txt"
+    register: result
+
+  - name: "write nvidia-smi-track.py for NAMD"
+    delegate_to: localhost
+    copy:
+      content: "{{ result.stdout }}"
+      dest: "{{benchmark_result_folder}}/nvidia_smi_namd_{{benchmark_batch_number}}.txt"
+
+
+
+  # ======================== END BODY ========================
+  rescue:
+    - fail:
+        msg: Maximum retries of grouped tasks reached
+      when: retry_count | int == 10
+    - name: Reboot because NAMD benchmark failed
+      reboot:
+        msg: "rebooting"
+    - include_tasks: ./benchmark_namd_loop_body.yaml
+

@@ -6,12 +6,13 @@ import shlex
 import subprocess
 import sys
 from xml.etree import cElementTree as ET
-from time import sleep
+from time import sleep, time
 from random import random
 
 PERIOD = 2  # second
 MAX_INACTIVE_DURATION = 600  # 600 secs
 MAX_INACTIVE_LOOP = MAX_INACTIVE_DURATION / PERIOD
+EXPIRATION_DURATION = 10 * 60  # in seconds
 
 
 def main(mode, resulting_file_name):
@@ -32,6 +33,9 @@ def start(temporary_file, resulting_file_name):
 
     # key: process name, value: dict consist of sample count, gpu util sum, gpu memory util sum
     process_to_total_utilization_mapping = {}
+    if previous_result_exists_and_not_expired_yet(resulting_file_name):
+        with open(temporary_file, "r") as f:
+            process_to_total_utilization_mapping = json.load(f)
 
     inactive_limit = MAX_INACTIVE_LOOP
     while True:
@@ -60,6 +64,12 @@ def start(temporary_file, resulting_file_name):
             return
         if not os.path.isfile(temporary_file):
             return
+
+
+def previous_result_exists_and_not_expired_yet(file_path):
+    return  (os.path.isfile(file_path)
+             and get_last_modification_timestamp(file_path) < int(time.time()) - EXPIRATION_DURATION)
+
 
 def initialize_track_result(utilization: dict, util_label: str):
     utilization[f'{util_label}-sum'] = 0
@@ -156,6 +166,8 @@ def get_processes(processes_xml_element) -> list:
     return ret
 
 
+def get_last_modification_timestamp(path):  # returns number of seconds since epoch
+    return os.path.getmtime(path)
 
 
 

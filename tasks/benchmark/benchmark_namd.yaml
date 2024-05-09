@@ -76,12 +76,6 @@
   when: "not f1atpase_extracted_folder.stat.exists"
 
 
-- name: Start nvidia-smi-track.py for NAMD
-  become: true
-  shell: >-
-    {{ nvidia_track_py_script }} START "{{base_path}}/track_result_nvidia_smi_namd.txt"
-  async: 10000
-  poll: 0
 
 # perform 6 batches, each 5 samples = 30 samples. Need to split into batches because for Nova Instance,
 # NAMD oftenly error. If samples in one batch is too big, then the chance of error will also bigger.
@@ -93,16 +87,6 @@
     loop_var: benchmark_batch_number
 
 
-- name: Stop nvidia-smi-track.py for NAMD
-  shell: >-
-    {{ nvidia_track_py_script }} STOP "{{base_path}}/track_result_nvidia_smi_namd.txt"
-  register: result
-
-- name: "write nvidia-smi-track.py for NAMD"
-  delegate_to: localhost
-  copy:
-    content: "{{ result.stdout }}"
-    dest: "{{benchmark_result_folder}}/nvidia_smi_namd.txt"
 
 
 
