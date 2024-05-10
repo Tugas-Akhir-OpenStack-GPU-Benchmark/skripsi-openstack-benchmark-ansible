@@ -12,17 +12,21 @@
     name:
       - "xserver-xorg-video-nvidia-{{nvidia_driver_version}}"
       - "libnvidia-cfg1-{{nvidia_driver_version}}"
+  when: "install_nvidia_and_nvcc_drivers"
 
 - name: "nvidia-driver-{{nvidia_driver_version}}, nvidia-dkms-{{nvidia_driver_version}}"
   apt:
     name:
       - "nvidia-driver-{{nvidia_driver_version}}"
       - "nvidia-dkms-{{nvidia_driver_version}}"
+  when: "install_nvidia_and_nvcc_drivers"
 
 - name: "nvidia-driver-{{nvidia_driver_version}}-server"
   apt:
     name:
       -  "nvidia-driver-{{nvidia_driver_version}}-server"
+  when: "install_nvidia_and_nvcc_drivers"
+
 
 - name: "xserver-xorg-video-dummy, glmark2"
   apt:

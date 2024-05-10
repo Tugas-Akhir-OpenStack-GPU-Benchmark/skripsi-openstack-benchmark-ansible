@@ -18,6 +18,10 @@
     restart_gdm_service: false
     validate_nvidia_pci_exists: true
 
+    # some Nvidia apt-package are keep being reinstalled by Ansible somehow, slowing down the benchmark process. This option come
+    # to skip them to save some time, as long as you're sure that those drivers already installed successfully
+    install_nvidia_and_nvcc_drivers: true
+
     use_namd_github_mirror: true
     namd_github_mirror: "https://github.com/Hzz-Hzz/Tugas-Akhir-OpenStack-LFS/raw/main/namd-download-cache.zip"
     namd_downloaded_mirror_cache_folder: "{{ base_path }}/namd-cache-folder"

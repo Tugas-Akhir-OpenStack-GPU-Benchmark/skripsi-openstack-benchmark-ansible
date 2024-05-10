@@ -43,7 +43,7 @@
     nvidia_driver_skip_reboot: no
 #    nvidia_driver_package_version: "525.147.05"
     nvidia_driver_persistence_mode_on: yes
-  when: "not nvidia_driver_is_installed.stat.exists"
+  when: "install_nvidia_and_nvcc_drivers and not nvidia_driver_is_installed.stat.exists"
 
 
 - name: Mark NVIDIA as installed
@@ -61,7 +61,7 @@
 # instead of installing in /usr/local/cuda, it will install in various folder (see dpkg -L nvidia-cuda-toolkit | grep include)
 # which will make cudnn's assertion error (sudo make clean && sudo make at cudnn_samples_v8/mnistCUDNN)
 # So we need to create symlink
-- when: "not cudnn_is_installed.stat.exists"
+- when: "install_nvidia_and_nvcc_drivers and not cudnn_is_installed.stat.exists"
   block:
   - name: "install nvcc (CUDA)"
     apt:
