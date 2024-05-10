@@ -14,7 +14,7 @@
 
 - name: "xserver-xorg-video-nvidia-{{nvidia_driver_version}}, libnvidia-cfg1-{{nvidia_driver_version}}"
   command: >-
-    aptitude install xserver-xorg-video-nvidia-{{nvidia_driver_version}} libnvidia-cfg1-{{nvidia_driver_version}}
+    aptitude install -y xserver-xorg-video-nvidia-{{nvidia_driver_version}} libnvidia-cfg1-{{nvidia_driver_version}}
   become: true
   when: "install_nvidia_and_nvcc_drivers"
 
@@ -22,13 +22,13 @@
 
 - name: "nvidia-driver-{{nvidia_driver_version}}, nvidia-dkms-{{nvidia_driver_version}}"
   command: >-
-    aptitude install nvidia-driver-{{nvidia_driver_version}} nvidia-dkms-{{nvidia_driver_version}}
+    aptitude install -y nvidia-driver-{{nvidia_driver_version}} nvidia-dkms-{{nvidia_driver_version}}
   become: true
   when: "install_nvidia_and_nvcc_drivers"
 
 - name: "nvidia-driver-{{nvidia_driver_version}}-server"
   command: >-
-    aptitude install nvidia-driver-{{nvidia_driver_version}}-server
+    aptitude install -y nvidia-driver-{{nvidia_driver_version}}-server
   become: true
   when: "install_nvidia_and_nvcc_drivers"
 
