@@ -12,8 +12,8 @@
     failed_when: false
 
 
-  - name: run Xorg Display Server
-    command: "Xorg :1"
+  - name: run Xvfb Display Server
+    command: "Xvfb :1122"
     become: true
     async: true
     poll: 0
@@ -42,8 +42,9 @@
     when: restart_gdm_service
 
   - name: "run glmark2 benchmarking {{benchmark_resolution}} ({{retry_count}})"
-    command: "{{ prime_run }} env DISPLAY=:1 vblank_mode=0 glmark2 -s {{benchmark_resolution}} -b :duration=3.0 2>&1"
-    become: false  # glmark2 should be run without sudo to improve performance
+    command: "{{ prime_run }} env DISPLAY=:1122 vblank_mode=0 glmark2 -s {{benchmark_resolution}} -b :duration=3.0 2>&1"
+    become: yes
+    become_user: glmark2_benchmark  # glmark2 should be run as non-root (a.k.a. without sudo privilege) to improve performance
     args:
       chdir: "{{ phoronix_folder }}"
     register: glmark2_benchmark_result

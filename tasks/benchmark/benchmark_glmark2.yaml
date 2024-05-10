@@ -1,4 +1,5 @@
 - block:
+    # update: use xvfb instead of xorg. Xorg seems to have FPS cap which is not good for GPU benchmarking
     - import_tasks: ./install_xorg_headless_virtual_display.yaml
   rescue:
     - debug:
@@ -13,7 +14,19 @@
     - import_tasks: ./install_xorg_headless_virtual_display.yaml  # retry once again
 
 
-### TODO migrate from phoronix to direct apt-get installation
+# we must run glmark2 as non-root user and without sudo. With sudo, its FPS only 60-70.
+# Without sudo, its FPS is about 600-700. Presumably due to additional security checks overhead in sudo/root user.
+- name: "create `glmark2_benchmark` user if not exists"
+  ansible.builtin.user:
+    name: glmark2_benchmark
+
+#- name: "check if `glmark2_benchmark` user already exists"
+#  command: "id -u glmark2_benchmark"
+#  register: "check_user_exists"
+#  failed_when: false
+#- name: "create `glmark2_benchmark` user if not exists"
+#  command: "useradd glmark2_benchmark"
+#  when: "check_user_exists.rc != 0"
 
 
 - name: "install libpng16-16"
@@ -35,8 +48,8 @@
 
 
 # `sudo ./prime-run env DISPLAY=:1 glmark2`
-- name: run Xorg Display Server
-  command: "Xorg :1"
+- name: run Xvfb Display Server
+  command: "Xvfb :1122"
   become: true
   async: true
   poll: 0
