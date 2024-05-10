@@ -15,7 +15,7 @@
     namd_version: 'namd-cuda-1.1.1'
     pytorch_phoronix_test_version: "pytorch-1.0.1"
     nvidia_driver_version: "525"
-    restart_gdm_service: true
+    restart_gdm_service: false
     validate_nvidia_pci_exists: true
 
     use_namd_github_mirror: true
