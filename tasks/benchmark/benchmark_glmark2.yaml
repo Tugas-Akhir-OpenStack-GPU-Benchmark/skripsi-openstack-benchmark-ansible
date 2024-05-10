@@ -50,7 +50,7 @@
 # `sudo ./prime-run env DISPLAY=:1 glmark2`
 - name: run Xvfb Display Server
   shell: >-
-    nohup "Xvfb :1122 2>&1 | tee /home/root/xvfb_nohup.log" &
+    nohup Xvfb :1122 2>&1 | tee /home/root/xvfb_nohup.log &
   become: true
 
 

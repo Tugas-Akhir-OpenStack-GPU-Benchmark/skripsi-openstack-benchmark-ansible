@@ -8,13 +8,13 @@
 
   - name: run Xvfb Display Server
     shell: >-
-      nohup "Xvfb :1122 2>&1 | tee /home/root/xvfb_nohup.log" &
+      nohup Xvfb :1122 2>&1 | tee /home/root/xvfb_nohup.log &
     become: true
     async: true
     poll: 0
     when: >- 
       glmark2_benchmark_result is not undefined 
-      and 'could not initialize canvas' in glmark2_benchmark_result.stdout.lower()
+      and 'could not initialize canvas' in glmark2_benchmark_result.stderr.lower()
 
   ## make sure no other apps using the GPU to ensure performance,
   ## as per suggested in https://ubuntuforums.org/archive/index.php/t-2131425.html

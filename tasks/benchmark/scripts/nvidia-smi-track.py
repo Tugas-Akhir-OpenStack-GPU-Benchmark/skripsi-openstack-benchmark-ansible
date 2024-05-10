@@ -125,7 +125,7 @@ def stop(temporary_file, resulting_file_name):
             with open(resulting_file_name, 'r') as f:
                 print(f.read())
             return
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             print(f"Warning: file not found error {temporary_file}, {repr(e)}")
             return
         except Exception as e:
