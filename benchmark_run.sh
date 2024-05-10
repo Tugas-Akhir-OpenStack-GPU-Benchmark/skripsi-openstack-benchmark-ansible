@@ -49,5 +49,10 @@ else
   echo "RETRY not detected... Will not retry on failing ansible task"
 fi
 
+echo "Starting to run ansible at $(date)"
+
 sudo ansible-playbook ./tasks/benchmark/main.yaml -i ./tasks/benchmark/inventory.yml -e "$ANSIBLE_EXTRAVARS"  --verbose
 #sudo ansible-playbook ./tasks/benchmark/main.yaml -i ./tasks/benchmark/inventory.yml -e "$ANSIBLE_EXTRAVARS" --verbose --start-at-task="Restart GDM service"
+
+
+echo "Finished running ansible at $(date)"
