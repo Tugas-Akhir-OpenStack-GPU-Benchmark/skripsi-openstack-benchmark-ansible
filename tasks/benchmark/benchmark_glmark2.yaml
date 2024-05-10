@@ -49,16 +49,9 @@
 
 # `sudo ./prime-run env DISPLAY=:1 glmark2`
 - name: run Xvfb Display Server
-  command: "Xvfb :1122"
+  shell: >-
+    nohup "Xvfb :1122 2>&1 | tee /home/root/xvfb_nohup.log" &
   become: true
-  async: true
-  poll: 0
-  register: xorg_display_server_async
-
-- debug:
-    var: xorg_display_server_async
-- debug:
-    msg: xorg_display_server_async
 
 
 - name: Perform Glmark2 benchmark

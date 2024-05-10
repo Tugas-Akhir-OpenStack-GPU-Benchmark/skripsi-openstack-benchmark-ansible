@@ -5,27 +5,16 @@
 
   # Run body while error happens, do it until 10 times.
   # ======================== BODY ========================
-  - name: "Check if xorg async task still active ({{retry_count}})"
-    async_status:
-      jid: "{{ xorg_display_server_async['ansible_job_id'] }}"
-    register: xorg_display_server_status
-    failed_when: false
-
 
   - name: run Xvfb Display Server
-    command: "Xvfb :1122"
+    shell: >-
+      nohup "Xvfb :1122 2>&1 | tee /home/root/xvfb_nohup.log" &
     become: true
     async: true
     poll: 0
-    register: xorg_display_server_async_next
-    when: "xorg_display_server_status.finished"
-  - debug:
-      var: "xorg_display_server_async_next"
-
-  - set_fact:
-      xorg_display_server_async: "{{xorg_display_server_async_next}}"
-    when: "'ansible_job_id' in xorg_display_server_async_next"
-
+    when: >- 
+      glmark2_benchmark_result is not undefined 
+      and 'could not initialize canvas' in glmark2_benchmark_result.stdout.lower()
 
   ## make sure no other apps using the GPU to ensure performance,
   ## as per suggested in https://ubuntuforums.org/archive/index.php/t-2131425.html

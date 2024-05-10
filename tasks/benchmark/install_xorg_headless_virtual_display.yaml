@@ -27,7 +27,7 @@
 - name: "xserver-xorg-video-dummy, glmark2"
   apt:
     name:
-      - xserver-xorg-video-dummy
+#      - xserver-xorg-video-dummy
       - xvfb
       - glmark2
 
