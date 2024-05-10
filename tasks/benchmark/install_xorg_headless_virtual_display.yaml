@@ -6,25 +6,30 @@
 ## Seems to successfully run `sudo ./prime-run env DISPLAY=:1 glmark2`
 ## Tapi belum uji coba complete-reset untuk uji coba ansible-nya
 
-- name: "xserver-xorg-video-nvidia-{{nvidia_driver_version}}, libnvidia-cfg1-{{nvidia_driver_version}}"
+- name: "apt install aptitude, more intelligent version of apt-get"
   apt:
-    update_cache: yes
     name:
-      - "xserver-xorg-video-nvidia-{{nvidia_driver_version}}"
-      - "libnvidia-cfg1-{{nvidia_driver_version}}"
+      - aptitude
+
+
+- name: "xserver-xorg-video-nvidia-{{nvidia_driver_version}}, libnvidia-cfg1-{{nvidia_driver_version}}"
+  command: >-
+    aptitude install xserver-xorg-video-nvidia-{{nvidia_driver_version}} libnvidia-cfg1-{{nvidia_driver_version}}
+  become: true
   when: "install_nvidia_and_nvcc_drivers"
 
+
+
 - name: "nvidia-driver-{{nvidia_driver_version}}, nvidia-dkms-{{nvidia_driver_version}}"
-  apt:
-    name:
-      - "nvidia-driver-{{nvidia_driver_version}}"
-      - "nvidia-dkms-{{nvidia_driver_version}}"
+  command: >-
+    aptitude install nvidia-driver-{{nvidia_driver_version}} nvidia-dkms-{{nvidia_driver_version}}
+  become: true
   when: "install_nvidia_and_nvcc_drivers"
 
 - name: "nvidia-driver-{{nvidia_driver_version}}-server"
-  apt:
-    name:
-      -  "nvidia-driver-{{nvidia_driver_version}}-server"
+  command: >-
+    aptitude install nvidia-driver-{{nvidia_driver_version}}-server
+  become: true
   when: "install_nvidia_and_nvcc_drivers"
 
 
@@ -34,16 +39,3 @@
 #      - xserver-xorg-video-dummy
       - xvfb
       - glmark2
-
-
-
-#- name: "install In-memory/buffer display to simulate display monitor (subsitute for Nvidia Xorg server)"
-#  apt:
-#    update_cache: yes
-#    name:
-#      - xvfb
-#
-#- name: run Display Server
-#  command: "Xvfb :1 -screen 0 1024x768x16"
-#  async: true
-#  poll: 0

@@ -2,6 +2,11 @@
   set_fact:
     pytorch_profile_folder: '/var/lib/phoronix-test-suite/test-profiles/pts/{{ pytorch_phoronix_test_version }}'
 
+- set_fact:
+    nvidia_track_py_script: "{{ base_path }}/nvidia-smi-track.py"
+  when: "nvidia_track_py_script is undefined"
+
+
 - debug:
     msg: "env DISPLAY=:0 ./phoronix-test-suite install {{ pytorch_phoronix_test_version }} 2>&1"
 
