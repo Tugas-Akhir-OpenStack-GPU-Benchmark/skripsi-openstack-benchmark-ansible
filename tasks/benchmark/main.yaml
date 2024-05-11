@@ -23,7 +23,7 @@
     install_nvidia_and_nvcc_drivers: true
 
     use_namd_github_mirror: true
-    namd_github_mirror: "https://github.com/Hzz-Hzz/Tugas-Akhir-OpenStack-LFS/raw/main/namd-download-cache.zip"
+    namd_github_mirror: "https://github.com/Tugas-Akhir-OpenStack-GPU-Benchmark/Tugas-Akhir-OpenStack-LFS/raw/main/namd-download-cache.zip"
     namd_downloaded_mirror_cache_folder: "{{ base_path }}/namd-cache-folder"
     namd_timeout_duration_per_sample: 60  # in second
 
