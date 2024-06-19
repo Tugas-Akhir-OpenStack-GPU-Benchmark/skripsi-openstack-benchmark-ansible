@@ -9,6 +9,7 @@
     - name: "sudo apt autoremove -y"
       command: "sudo apt autoremove -y"
     - name: Reboot
+      when: "allow_reboot"
       reboot:
         msg: "rebooting"
     - import_tasks: ./install_xorg_headless_virtual_display.yaml  # retry once again

@@ -40,7 +40,7 @@
   import_role:
     name: nvidia.nvidia_driver
   vars:
-    nvidia_driver_skip_reboot: no
+    nvidia_driver_skip_reboot: "{{ not allow_reboot }}"
 #    nvidia_driver_package_version: "525.147.05"
     nvidia_driver_persistence_mode_on: yes
   when: "install_nvidia_and_nvcc_drivers and not nvidia_driver_is_installed.stat.exists"

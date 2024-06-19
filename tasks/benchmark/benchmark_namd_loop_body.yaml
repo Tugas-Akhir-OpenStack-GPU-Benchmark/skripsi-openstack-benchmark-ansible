@@ -72,6 +72,7 @@
         msg: Maximum retries of grouped tasks reached
       when: retry_count | int == 60
     - name: Reboot because NAMD benchmark failed
+      when: "allow_reboot"
       reboot:
         msg: "rebooting"
     - include_tasks: ./benchmark_namd_loop_body.yaml
