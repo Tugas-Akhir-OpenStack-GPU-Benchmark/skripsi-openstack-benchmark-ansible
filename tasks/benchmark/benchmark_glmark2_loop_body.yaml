@@ -52,6 +52,6 @@
   rescue:
     - fail:
         msg: Maximum retries of grouped tasks reached
-      when: retry_count | int == 10
+      when: retry_count | int == 25
     - include_tasks: ./benchmark_glmark2_loop_body.yaml
 
