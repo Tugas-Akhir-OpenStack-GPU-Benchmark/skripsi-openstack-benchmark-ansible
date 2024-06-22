@@ -50,9 +50,6 @@
     async: 3600  # Set an appropriate timeout (in seconds) for how long to wait for the command to complete
     poll: 0      # Polling set to 0 means Ansible will not wait for the command to complete
     register: result
-    retries: 3   # Number of retries in case the command fails
-    delay: 10    # Delay between retries (in seconds)
-    until: result.rc == 0  # Retry until the command succeeds
 
   - name: Pause for 5 seconds
     wait_for:
@@ -92,6 +89,6 @@
   rescue:
     - fail:
         msg: Maximum retries of grouped tasks reached
-      when: retry_count | int == 25
+      when: retry_count | int == 30
     - include_tasks: ./benchmark_glmark2_loop_body.yaml
 
