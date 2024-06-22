@@ -33,7 +33,7 @@
   - name: list of Glmark2 processes
     become: true
     shell: >-
-      pgrep -i GLMARK | grep -v ^$$\$  | xargs ps -p
+      pgrep -i GLMARK | grep -v ^$$\$  | xargs ps
 
   - name: make sure no other instance of glmark2 is running
     become: true
