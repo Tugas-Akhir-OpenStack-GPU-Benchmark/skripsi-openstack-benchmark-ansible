@@ -51,9 +51,9 @@
     poll: 0      # Polling set to 0 means Ansible will not wait for the command to complete
     register: result
 
-  - name: Pause for 5 seconds
+  - name: Pause for 10 seconds
     wait_for:
-      timeout: 5
+      timeout: 10
       state: absent
 
   - name: make sure glmark2 warm-up instance is running properly
