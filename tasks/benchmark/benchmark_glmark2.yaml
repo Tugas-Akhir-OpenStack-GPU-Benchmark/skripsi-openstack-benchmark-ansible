@@ -41,11 +41,12 @@
   when: "nvidia_track_py_script is undefined"
 
 
-- name: make sure no other instance of nvidia-smi-track is running
+- name: Make sure no other instance of nvidia-smi-track is running
   become: true
-  shell: >-
+  shell: >
     pgrep -fi nvidia-smi-track | xargs --no-run-if-empty kill
-
+  register: kill_output
+  failed_when: "kill_output.rc != 0 and kill_output.rc != -15"
 
 - name: Start nvidia-smi-track.py for Glmark2
   become: true

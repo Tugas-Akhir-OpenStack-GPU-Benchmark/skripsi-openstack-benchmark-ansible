@@ -75,10 +75,12 @@
     remote_src: yes
   when: "not f1atpase_extracted_folder.stat.exists"
 
-- name: make sure no other instance of nvidia-smi-track is running
+- name: Make sure no other instance of nvidia-smi-track is running
   become: true
-  shell: >-
+  shell: >
     pgrep -fi nvidia-smi-track | xargs --no-run-if-empty kill
+  register: kill_output
+  failed_when: "kill_output.rc != 0 and kill_output.rc != -15"
 
 
 # perform 6 batches, each 5 samples = 30 samples. Need to split into batches because for Nova Instance,
