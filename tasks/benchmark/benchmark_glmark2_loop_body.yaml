@@ -30,6 +30,40 @@
       and 'unknown state' not in gdm_service.msg.lower()
     when: restart_gdm_service
 
+  - name: make sure no other instance of glmark2 is running
+    become: true
+    shell: >-
+      sudo pgrep -fi GLMARK | sudo xargs kill
+
+  - name: "run glmark2 mini to make sure GPU is warmed-up"
+    command: "{{ prime_run }} env DISPLAY=:1122 vblank_mode=0 glmark2 -s 1x1 -b :duration=20.0"
+    become: yes
+    become_user: glmark2_benchmark
+    args:
+      chdir: "{{ phoronix_folder }}"
+    async: 3600  # Set an appropriate timeout (in seconds) for how long to wait for the command to complete
+    poll: 0      # Polling set to 0 means Ansible will not wait for the command to complete
+    register: result
+    retries: 3   # Number of retries in case the command fails
+    delay: 10    # Delay between retries (in seconds)
+    until: result.rc == 0  # Retry until the command succeeds
+
+  - name: Pause for 5 seconds
+    wait_for:
+      timeout: 5
+      state: absent
+
+  - name: make sure glmark2 warm-up instance is running properly
+    become: true
+    command: "pgrep -i GLMARK"
+    register: pgrep_output
+  - name: "Assert glmark2 warm-up instance is running"
+    assert:
+      that:
+        - pgrep_output.stdout is defined
+        - pgrep_output.stdout != ""
+      fail_msg: "glmark2 warm-up instance is not running"
+
   - name: "run glmark2 benchmarking {{benchmark_resolution}} ({{retry_count}})"
     command: "{{ prime_run }} env DISPLAY=:1122 vblank_mode=0 glmark2 -s {{benchmark_resolution}} -b :duration=3.0 2>&1"
     become: yes
