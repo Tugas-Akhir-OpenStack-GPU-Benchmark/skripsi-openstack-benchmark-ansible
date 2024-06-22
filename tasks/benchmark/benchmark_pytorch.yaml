@@ -35,6 +35,11 @@
     src: ./test-profiles/pytorch-test-definition.xml
     dest: "{{ pytorch_profile_folder }}/test-definition.xml"
 
+- name: make sure no other instance of nvidia-smi-track is running
+  become: true
+  shell: >-
+    pgrep -fi nvidia-smi-track | xargs --no-run-if-empty kill
+
 
 - name: Start nvidia-smi-track.py for PyTorch
   become: true

@@ -40,6 +40,13 @@
     nvidia_track_py_script: "{{ base_path }}/nvidia-smi-track.py"
   when: "nvidia_track_py_script is undefined"
 
+
+- name: make sure no other instance of nvidia-smi-track is running
+  become: true
+  shell: >-
+    pgrep -fi nvidia-smi-track | xargs --no-run-if-empty kill
+
+
 - name: Start nvidia-smi-track.py for Glmark2
   become: true
   shell: >-
@@ -71,4 +78,9 @@
   copy:
     content: "{{ result.stdout }}"
     dest: "{{benchmark_result_folder}}/nvidia_smi_glmark2.txt"
+
+- name: make sure no other instance of glmark2 is running
+  become: true
+  shell: >-
+    pgrep -i GLMARK | grep -v ^$$\$  | xargs --no-run-if-empty kill
 
