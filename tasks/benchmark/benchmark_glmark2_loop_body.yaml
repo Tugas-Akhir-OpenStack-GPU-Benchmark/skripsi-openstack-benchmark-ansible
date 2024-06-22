@@ -38,7 +38,7 @@
   - name: make sure no other instance of glmark2 is running
     become: true
     shell: >-
-      pgrep -i GLMARK | grep -v ^$$\$  | xargs kill
+      pgrep -i GLMARK | grep -v ^$$\$  | xargs --no-run-if-empty kill
 
 
   - name: "run glmark2 mini to make sure GPU is warmed-up"
