@@ -33,7 +33,7 @@
   - name: make sure no other instance of glmark2 is running
     become: true
     shell: >-
-      sudo pgrep -fi GLMARK | sudo xargs kill
+      sudo pgrep -i GLMARK | sudo xargs kill
 
   - name: "run glmark2 mini to make sure GPU is warmed-up"
     command: "{{ prime_run }} env DISPLAY=:1122 vblank_mode=0 glmark2 -s 1x1 -b :duration=20.0"
