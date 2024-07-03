@@ -41,31 +41,31 @@
       pgrep -i GLMARK | grep -v ^$$\$  | xargs --no-run-if-empty kill
 
 
-  - name: "run glmark2 mini to make sure GPU is warmed-up"
-    command: "{{ prime_run }} env DISPLAY=:1122 vblank_mode=0 glmark2 -s 1x1 -b :duration=20.0"
-    become: yes
-    become_user: glmark2_benchmark
-    args:
-      chdir: "{{ phoronix_folder }}"
-    async: 3600  # Set an appropriate timeout (in seconds) for how long to wait for the command to complete
-    poll: 0      # Polling set to 0 means Ansible will not wait for the command to complete
-    register: result
-
-  - name: Pause for 10 seconds
-    wait_for:
-      timeout: 10
-      state: absent
-
-  - name: make sure glmark2 warm-up instance is running properly
-    become: true
-    command: "pgrep -i GLMARK"
-    register: pgrep_output
-  - name: "Assert glmark2 warm-up instance is running"
-    assert:
-      that:
-        - pgrep_output.stdout is defined
-        - pgrep_output.stdout != ""
-      fail_msg: "glmark2 warm-up instance is not running"
+#  - name: "run glmark2 mini to make sure GPU is warmed-up"
+#    command: "{{ prime_run }} env DISPLAY=:1122 vblank_mode=0 glmark2 -s 1x1 -b :duration=20.0"
+#    become: yes
+#    become_user: glmark2_benchmark
+#    args:
+#      chdir: "{{ phoronix_folder }}"
+#    async: 3600  # Set an appropriate timeout (in seconds) for how long to wait for the command to complete
+#    poll: 0      # Polling set to 0 means Ansible will not wait for the command to complete
+#    register: result
+#
+#  - name: Pause for 10 seconds
+#    wait_for:
+#      timeout: 10
+#      state: absent
+#
+#  - name: make sure glmark2 warm-up instance is running properly
+#    become: true
+#    command: "pgrep -i GLMARK"
+#    register: pgrep_output
+#  - name: "Assert glmark2 warm-up instance is running"
+#    assert:
+#      that:
+#        - pgrep_output.stdout is defined
+#        - pgrep_output.stdout != ""
+#      fail_msg: "glmark2 warm-up instance is not running"
 
   - name: "run glmark2 benchmarking {{benchmark_resolution}} ({{retry_count}})"
     command: "{{ prime_run }} env DISPLAY=:1122 vblank_mode=0 glmark2 -s {{benchmark_resolution}} -b :duration=3.0 2>&1"
